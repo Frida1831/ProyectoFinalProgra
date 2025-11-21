@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar compra - Chochetitos</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header></header>
+
+<main class="container page">
+    <section class="checkout">
+        <h1>Finalizar compra</h1>
+        <p>Completa los datos para procesar tu compra.</p>
+
+        <div class="checkout-grid">
+
+            <!-- FORMULARIO -->
+            <form id="checkout-form" class="checkout-form">
+
+                <h3>Información del cliente</h3>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Ej. Yasmin Trinidad" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" required>
+                </div>
+
+                <h3>Dirección de envío</h3>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" placeholder="Calle #123" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cp">Código postal</label>
+                    <input type="text" id="cp" placeholder="12345" required>
+                </div>
+
+                <h3>Método de pago</h3>
+
+                <div class="form-group">
+                    <label for="metodo">Selecciona un método</label>
+                    <select id="metodo" required>
+                        <option value="">Selecciona...</option>
+                        <option value="tarjeta">Tarjeta de crédito/débito</option>
+                        <option value="oxxo">Pago en OXXO</option>
+                        <option value="transferencia">Transferencia bancaria</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Confirmar compra</button>
+
+                <p id="checkout-message" class="auth-message"></p>
+            </form>
+
+            <!-- RESUMEN -->
+            <div class="checkout-summary">
+                <h3>Resumen de compra</h3>
+
+                <div id="checkout-items"></div>
+
+                <p class="summary-row">Subtotal: <span id="checkout-subtotal">$0.00</span></p>
+                <p class="summary-row">Envío: <span>$40.00</span></p>
+                <p class="summary-total">Total: <span id="checkout-total">$0.00</span></p>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer></footer>
+
+<script src="js/componentes.js"></script>
+<script src="js/checkout.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - Chochetitos</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- HEADER dinámico -->
+    <header></header>
+
+    <main class="container page">
+
+        <section class="catalogo">
+            <h1>Catálogo</h1>
+
+            <!-- FILTROS -->
+            <div class="filters">
+                <div>
+                    <label>Categoría</label>
+                    <select id="filtroCategoria">
+                        <option value="todos">Todas</option>
+                        <option value="amigurumis">Amigurumis</option>
+                        <option value="accesorios">Accesorios</option>
+                        <option value="decoracion">Decoración</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Precio mínimo</label>
+                    <input type="number" id="precioMin" placeholder="$0">
+                </div>
+
+                <div>
+                    <label>Precio máximo</label>
+                    <input type="number" id="precioMax" placeholder="$1000">
+                </div>
+
+                <div>
+                    <label>Oferta</label>
+                    <select id="filtroOferta">
+                        <option value="todos">Todas</option>
+                        <option value="oferta">Solo en oferta</option>
+                    </select>
+                </div>
+
+                <button id="btnFiltrar" class="btn-primary">Aplicar filtros</button>
+            </div>
+
+            <!-- GRID DE PRODUCTOS -->
+            <div id="productosGrid" class="product-grid">
+             <!-- Aquí JS va a insertar las tarjetas -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE DETALLE DE PRODUCTO -->
+<div id="productModal" class="modal">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="closeModal">&times;</button>
+
+    <div class="modal-body">
+      <div class="modal-img">
+        <img id="modalImg" src="" alt="">
+      </div>
+      <div class="modal-info">
+        <h2 id="modalNombre"></h2>
+        <p id="modalCategoria" class="modal-tag"></p>
+        <p id="modalDescripcion"></p>
+        <p class="modal-precio" id="modalPrecio"></p>
+        <p class="modal-dispo" id="modalDisponibilidad"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- FOOTER dinámico -->
+   <footer></footer>
+
+<script src="js/componentes.js"></script>
+<script src="js/productos.js"></script>
+</body>
+</html>
+
