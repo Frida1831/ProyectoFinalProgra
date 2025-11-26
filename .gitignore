@@ -13,10 +13,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Env (credenciales)
-.env
-backend/.env
-frontend/.env
 
 # Base de datos local (ejemplos)
 *.sqlite

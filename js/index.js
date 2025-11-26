@@ -65,20 +65,16 @@ function renderDestacados(lista) {
     if (p.categoria === "accesorios") badgeTexto = "Accesorio";
     if (p.categoria === "decoracion") badgeTexto = "Decoración";
 
-    // calculamos piezas y disponibilidad aquí también
-    let piezas = (p.stock === undefined || p.stock === null)
-      ? 0
-      : Number(p.stock);
+    let piezas =
+      p.stock === undefined || p.stock === null ? 0 : Number(p.stock);
     if (isNaN(piezas) || piezas < 0) piezas = 0;
 
-    const dispo = piezas <= 0
-      ? "Agotado"
-      : (p.disponibilidad || "Disponible");
+    const dispo = piezas <= 0 ? "Agotado" : (p.disponibilidad || "Disponible");
 
     card.innerHTML = `
       <div class="product-badge offer">${badgeTexto}</div>
 
-      <button class="favorite-btn">
+      <button class="favorite-btn" data-id="${p.id}">
         <i class="fa-regular fa-heart"></i>
       </button>
 

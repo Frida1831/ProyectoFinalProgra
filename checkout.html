@@ -47,16 +47,75 @@
                     <input type="text" id="cp" placeholder="12345" required>
                 </div>
 
+                <h3>Envío</h3>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" placeholder="55 1234 5678" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pais">País</label>
+                    <select id="pais" required>
+                        <option value="">Selecciona...</option>
+                        <option value="mx">México</option>
+                        <option value="us">Estados Unidos</option>
+                        <option value="latam">Latinoamérica</option>
+                    </select>
+                </div>
+
                 <h3>Método de pago</h3>
 
                 <div class="form-group">
                     <label for="metodo">Selecciona un método</label>
+
                     <select id="metodo" required>
                         <option value="">Selecciona...</option>
                         <option value="tarjeta">Tarjeta de crédito/débito</option>
                         <option value="oxxo">Pago en OXXO</option>
                         <option value="transferencia">Transferencia bancaria</option>
                     </select>
+                </div>
+
+                <!-- CAMPOS TARJETA -->
+                <div id="pago-tarjeta" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
+                    <div class="form-group">
+                        <label for="numTarjeta">Número de tarjeta</label>
+                        <input type="text" id="numTarjeta" placeholder="XXXX XXXX XXXX XXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreTarjeta">Nombre en la tarjeta</label>
+                        <input type="text" id="nombreTarjeta" placeholder="Como aparece en la tarjeta">
+                    </div>
+                    <div class="form-group">
+                        <label for="expTarjeta">Fecha de expiración</label>
+                        <input type="text" id="expTarjeta" placeholder="MM/AA">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvvTarjeta">CVV</label>
+                        <input type="password" id="cvvTarjeta" placeholder="3 dígitos">
+                    </div>
+                </div>
+
+                <!-- PAGO TRANSFERENCIA -->
+                <div id="pago-transferencia" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
+                    <p>Realiza la transferencia a la siguiente cuenta:</p>
+                    <p><strong>Banco:</strong> Banco Ejemplo</p>
+                    <p><strong>CLABE:</strong> 123456789012345678</p>
+                    <div class="form-group">
+                        <label for="referenciaTransf">Referencia de pago</label>
+                        <input type="text" id="referenciaTransf" placeholder="Escribe la referencia de tu comprobante">
+                    </div>
+                </div>
+
+                <!-- PAGO OXXO -->
+                <div id="pago-oxxo" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
+                    <p>Se generará una referencia para pagar en OXXO:</p>
+                    <p><strong>Número de referencia:</strong> 1234 5678 9012 3456</p>
+                    <div class="form-group">
+                        <label for="nombreOxxo">Nombre de quien pagará</label>
+                        <input type="text" id="nombreOxxo" placeholder="Nombre completo">
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary">Confirmar compra</button>
@@ -71,7 +130,16 @@
                 <div id="checkout-items"></div>
 
                 <p class="summary-row">Subtotal: <span id="checkout-subtotal">$0.00</span></p>
-                <p class="summary-row">Envío: <span>$40.00</span></p>
+                <p class="summary-row">Impuestos: <span id="checkout-impuestos">$0.00</span></p>
+                <p class="summary-row">Envío: <span id="checkout-envio">$40.00</span></p>
+
+                <div class="form-group" style="margin-top: 0.8rem;">
+                    <label for="cupon">Cupón de descuento</label>
+                    <input type="text" id="cupon" placeholder="Ej. CROCHET10">
+                </div>
+
+                <p class="summary-row">Descuento: <span id="checkout-descuento">$0.00</span></p>
+
                 <p class="summary-total">Total: <span id="checkout-total">$0.00</span></p>
             </div>
 
@@ -83,6 +151,29 @@
 
 <script src="js/componentes.js"></script>
 <script src="js/checkout.js"></script>
+
+<!-- TU SCRIPT PARA MÉTODOS DE PAGO -->
+<script>
+const metodoSelect = document.getElementById("metodo");
+const pagoTarjeta = document.getElementById("pago-tarjeta");
+const pagoTransferencia = document.getElementById("pago-transferencia");
+const pagoOxxo = document.getElementById("pago-oxxo");
+const mensaje = document.getElementById("checkout-message");
+
+function actualizarCamposPago() {
+    const metodo = metodoSelect.value;
+
+    pagoTarjeta.style.display = "none";
+    pagoTransferencia.style.display = "none";
+    pagoOxxo.style.display = "none";
+
+    if (metodo === "tarjeta") pagoTarjeta.style.display = "block";
+    if (metodo === "transferencia") pagoTransferencia.style.display = "block";
+    if (metodo === "oxxo") pagoOxxo.style.display = "block";
+}
+
+metodoSelect.addEventListener("change", actualizarCamposPago);
+</script>
 
 </body>
 </html>

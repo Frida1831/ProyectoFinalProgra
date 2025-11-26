@@ -246,14 +246,14 @@ h1, h2, h3, h4 {
 }
 
 .hero-img-placeholder,
-    .hero-image img {
+.hero-image img {
     width: 100%;
     max-width: 360px;
     aspect-ratio: 4 / 5;
     border-radius: 1.8rem;
     object-fit: cover;
     box-shadow: 0 20px 30px rgba(0,0,0,0.1);
-    }
+}
 
 /* ====== PRODUCTOS ====== */
 main {
@@ -807,10 +807,12 @@ main {
     transition: transform 0.4s ease;
 }
 
-/* cuando el mouse está sobre la tarjeta, hacemos zoom a la imagen */
+/* ❌ AQUÍ DESACTIVAMOS EL ZOOM DE LA IMAGEN */
+/*
 .product-card:hover .product-img img {
     transform: scale(1.07);
 }
+*/
 
 .btn-secondary {
     border-radius: 999px;
@@ -821,7 +823,8 @@ main {
     font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.25s ease, color 0.25s ease,
-                box-shadow 0.25s ease, transform 0.2s ease;
+            box-shadow 0.25s ease, transform 0.2s ease;
+
 }
 
 .btn-secondary:hover {
@@ -849,11 +852,12 @@ main {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* cuando se pasa el mouse por la tarjeta, badge también reacciona */
+/*
 .product-card:hover .product-badge.offer {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(184, 107, 255, 0.6);
 }
+*/
 
 .favorite-btn {
     position: absolute;
@@ -996,11 +1000,12 @@ main {
     transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* EFECTO AL PASAR EL MOUSE */
+/*
 .hero-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 28px 45px rgba(0,0,0,0.12);
 }
+*/
 
 /* CONTENEDOR DE LA IMAGEN */
 .hero-img {
@@ -1020,16 +1025,18 @@ main {
     transition: transform 0.45s ease;
 }
 
-/* EFECTO HOVER: ZOOM SUAVE */
+/*
 .hero-img:hover img {
     transform: scale(1.08);
 }
+*/
 
-/* FLOTADO DEL CONTENEDOR TAMBIÉN */
+/*
 .hero-img:hover {
     transform: translateY(-6px);
     box-shadow: 0 26px 45px rgba(0,0,0,0.10);
 }
+*/
 
 .hero-card {
     transform-style: preserve-3d;
@@ -1175,3 +1182,922 @@ main {
   font-size: 0.9rem;
   color: #5a4c7d;
 }
+
+/* =========================
+   CARRITO DE COMPRA
+   ========================= */
+
+.cart {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr);
+    gap: 2rem;
+    align-items: flex-start;
+    margin-top: 2rem;
+}
+
+/* Lista de productos del carrito */
+.cart-items {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(102, 51, 153, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Mensaje carrito vacío */
+.empty-cart {
+    text-align: center;
+    font-weight: 500;
+    color: #7b3fe4;
+    padding: 2rem 1rem;
+    background: #f7ecff;
+    border-radius: 14px;
+}
+
+/* Cada item del carrito */
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #f9f2ff;
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(123, 63, 228, 0.22);
+    background: #f4e6ff;
+}
+
+/* Sección izquierda (imagen + info) */
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Imagen del carrito */
+.cart-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 16px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Nombre y precio */
+.cart-item-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #32174d;
+}
+
+.cart-item-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b5a7b;
+}
+
+/* Botón eliminar */
+.remove-btn {
+    border: none;
+    background: #ffe5ec;
+    color: #d62839;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.remove-btn i {
+    font-size: 0.9rem;
+}
+
+.remove-btn:hover {
+    background: #ffd1dd;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(214, 40, 57, 0.35);
+}
+
+/* Resumen del carrito (columna derecha) */
+.cart-summary {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1.5rem 1.8rem;
+    box-shadow: 0 10px 30px rgba(102, 51, 153, 0.12);
+    position: sticky;
+    top: 90px;
+}
+
+.cart-summary h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #32174d;
+}
+
+.cart-summary p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    color: #4b3b60;
+}
+
+.cart-summary .total {
+    margin-top: 0.8rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #7b3fe4;
+}
+
+/* Botón de checkout en el resumen */
+.cart-summary .btn-primary {
+    width: 100%;
+    margin-top: 1.2rem;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 768px) {
+    .cart {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-summary {
+        position: static;
+        margin-top: 1.5rem;
+    }
+
+    .cart-img {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+/* =========================
+   CHECKOUT
+   ========================= */
+
+.checkout {
+    margin-top: 2rem;
+}
+
+.checkout-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+/* Tarjeta del formulario */
+.checkout-form {
+    background: #ffffff;
+    padding: 1.8rem 2rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(123, 63, 228, 0.12);
+}
+
+.checkout-form h3 {
+    margin-top: 1.2rem;
+    margin-bottom: 0.6rem;
+    font-size: 1rem;
+    color: #32174d;
+}
+
+/* Inputs más bonitos */
+.checkout-form .form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #503568;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.checkout-form .form-group input,
+.checkout-form .form-group select,
+.checkout-form .form-group textarea {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid #e1c9ff;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    background: #fff9ff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.checkout-form .form-group textarea {
+    border-radius: 14px;
+    resize: vertical;
+    min-height: 90px;
+}
+
+.checkout-form .form-group input:focus,
+.checkout-form .form-group select:focus,
+.checkout-form .form-group textarea:focus {
+    border-color: #7b3fe4;
+    box-shadow: 0 0 0 3px rgba(123, 63, 228, 0.18);
+    background: #ffffff;
+}
+
+/* Botón confirmar compra */
+.checkout-form .btn-primary {
+    margin-top: 1.4rem;
+}
+
+/* Tarjeta resumen */
+.checkout-summary {
+    background: #ffffff;
+    padding: 1.6rem 1.8rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(123, 63, 228, 0.12);
+    position: sticky;
+    top: 90px;
+}
+
+.checkout-summary h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    color: #32174d;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #4b3b60;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed #e3cffb;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #7b3fe4;
+}
+
+/* Items del resumen */
+.checkout-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.checkout-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 14px;
+    object-fit: cover;
+}
+
+.checkout-item-info h4 {
+    margin: 0 0 0.15rem 0;
+    font-size: 0.95rem;
+    color: #32174d;
+}
+
+.checkout-item-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b5a7b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-summary {
+        position: static;
+        margin-top: 1.5rem;
+    }
+}
+
+/* =========================
+   ACCESIBILIDAD
+   ========================= */
+
+/* Botón flotante */
+.access-widget {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 9999;
+  font-family: inherit;
+}
+
+.access-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #7b3fe4;
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(123, 63, 228, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.access-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(123, 63, 228, 0.6);
+  background: #6730d0;
+}
+
+/* Panel */
+.access-panel {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+  width: 240px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  padding: 1rem 1.1rem;
+  font-size: 0.9rem;
+  color: #32174d;
+  display: none;
+}
+
+.access-panel.show {
+  display: block;
+}
+
+.access-panel h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.access-section {
+  margin-bottom: 0.7rem;
+  border-bottom: 1px solid #f0e4ff;
+  padding-bottom: 0.6rem;
+}
+
+.access-section:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.access-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* ==== Control de zoom de texto ==== */
+
+html {
+  font-size: 100%; /* base para el zoom */
+}
+
+.zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.zoom-btn {
+  border: 1px solid #d8c2ff;
+  background: #f8f1ff;
+  color: #4b2c90;
+  border-radius: 999px;
+  width: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.zoom-btn:hover {
+  background: #e9d7ff;
+  box-shadow: 0 0 0 2px rgba(123, 63, 228, 0.18);
+}
+
+.zoom-label {
+  min-width: 3.5ch;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+
+/* Switch simple para modo oscuro */
+.access-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.access-switch input {
+  accent-color: #7b3fe4;
+}
+
+/* Tamaño de texto global (afecta todo el sitio) */
+body.font-size-small {
+  font-size: 14px;
+}
+
+body.font-size-medium {
+  font-size: 16px;
+}
+
+body.font-size-large {
+  font-size: 18px;
+}
+
+/* =========================
+   DARK MODE (modo oscuro)
+   ========================= */
+
+body.dark-mode {
+  background-color: #140b22;
+  color: #f8f2ff;
+}
+
+/* Tarjetas y contenedores principales */
+body.dark-mode .page,
+body.dark-mode main.container,
+body.dark-mode .hero,
+body.dark-mode .products,
+body.dark-mode .catalogo,
+body.dark-mode .contact,
+body.dark-mode .checkout,
+body.dark-mode .cart,
+body.dark-mode .about,
+body.dark-mode .faq,
+body.dark-mode .auth,
+body.dark-mode .admin {
+  background-color: transparent;
+}
+
+body.dark-mode .hero-card,
+body.dark-mode .product-card,
+body.dark-mode .about-card,
+body.dark-mode .team-card,
+body.dark-mode .checkout-form,
+body.dark-mode .checkout-summary,
+body.dark-mode .cart-summary,
+body.dark-mode .admin-form,
+body.dark-mode .admin-table table,
+body.dark-mode .faq-item {
+  background-color: #231433;
+  color: #f7ecff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  border-color: #3a2255;
+}
+
+/* Header y footer */
+body.dark-mode .header,
+body.dark-mode header,
+body.dark-mode .footer,
+body.dark-mode footer {
+  background-color: #1b0f2a;
+  color: #f8f1ff;
+}
+
+/* Textos y enlaces */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #fdf2ff;
+}
+
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode span,
+body.dark-mode label {
+  color: #eee0ff;
+}
+
+body.dark-mode a {
+  color: #c7a5ff;
+}
+
+body.dark-mode a:hover {
+  color: #f7d5ff;
+}
+
+/* Inputs en modo oscuro */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #2d1845;
+  border-color: #5f3ba2;
+  color: #f9f0ff;
+}
+
+/* Botones principales se mantienen pero con un poco más de contraste */
+body.dark-mode .btn-primary {
+  box-shadow: 0 12px 24px rgba(255, 255, 255, 0.12);
+}
+
+/* Modal en modo oscuro */
+body.dark-mode .modal-content {
+  background-color: #271639;
+  color: #f7ecff;
+}
+
+/* FAQ en modo oscuro */
+body.dark-mode .faq-question {
+  background-color: #2d1845;
+  color: #f7ecff;
+}
+
+/* Accesibilidad: botón se ajusta al fondo oscuro */
+body.dark-mode .access-panel {
+  background: #241432;
+  color: #f7ecff;
+  border: 1px solid #3b2257;
+}
+
+/* =========================
+   AJUSTES DARK MODE CHOCHETITOS
+   ========================= */
+
+/* Fondo general más oscuro */
+body.dark-mode {
+  background-color: #080313;
+}
+
+/* Quitar esos bloques rosa claros de secciones completas */
+body.dark-mode main,
+body.dark-mode .page,
+body.dark-mode .hero,
+body.dark-mode .products,
+body.dark-mode .catalogo,
+body.dark-mode .contact,
+body.dark-mode .about,
+body.dark-mode .faq,
+body.dark-mode .cart,
+body.dark-mode .checkout,
+body.dark-mode .auth,
+body.dark-mode .admin {
+  background-color: #080313;
+}
+
+/* Tarjetas y paneles que antes eran rositas */
+body.dark-mode .hero-card,
+body.dark-mode .filters,
+body.dark-mode .contact-form,
+body.dark-mode .product-card,
+body.dark-mode .about-card,
+body.dark-mode .team-card,
+body.dark-mode .faq-item,
+body.dark-mode .checkout-form,
+body.dark-mode .checkout-summary,
+body.dark-mode .cart-summary,
+body.dark-mode .admin-form,
+body.dark-mode .admin-table table {
+  background-color: #1a0f2b;
+  border-color: #34204b;
+  color: #f7ecff;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* Header, barra superior y navegación */
+body.dark-mode .top-bar {
+  background: linear-gradient(90deg, #2c1743, #5a2ca0);
+  color: #fbe9ff;
+}
+
+body.dark-mode header,
+body.dark-mode .nav-bar {
+  background-color: #0c0416;
+}
+
+/* Todos los links y botones del header (incluye "Salir") */
+body.dark-mode header a,
+body.dark-mode header button {
+  color: #fdf2ff;
+}
+
+body.dark-mode .nav-links a:hover {
+  color: #ffb3ff;
+}
+
+/* Placeholders y textos secundarios que se veían deslavados */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #c9a6ff;
+}
+
+/* Inputs en dark mode, un poco más oscuros */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #2d1845;
+  border-color: #5f3ba2;
+  color: #f9f0ff;
+}
+
+/* Botón de accesibilidad sobre el fondo oscuro */
+body.dark-mode .access-toggle {
+  background: #f5c2ff;
+  color: #2b103f;
+}
+
+body.dark-mode .access-toggle:hover {
+  background: #ffd0ff;
+}
+
+/* ==== FIX ROSA EN DARK MODE ==== */
+
+/* Forzamos fondo oscuro global */
+body.dark-mode {
+  background-color: #080313 !important;
+  background-image: none !important;
+}
+
+/* Hero y su contenedor */
+body.dark-mode .hero {
+  background-color: #080313 !important;
+  background-image: none !important;
+}
+
+/* Si tu hero tiene un pseudo-elemento para el glow */
+body.dark-mode .hero::before,
+body.dark-mode .hero::after {
+  background: none !important;
+}
+
+.nav-fav-btn {
+  position: relative;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: inherit;
+}
+
+.fav-count-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #ff5ca8;
+  color: #fff;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* =========================
+   PÁGINA: MIS FAVORITOS
+   ========================= */
+
+.favorites-page {
+  padding-top: 2.5rem;
+  padding-bottom: 3rem;
+}
+
+/* título y subtítulo */
+.favorites-page h1 {
+  font-size: clamp(2.1rem, 3vw, 2.6rem);
+  margin-bottom: 0.25rem;
+}
+
+.favorites-subtitle {
+  color: #7b6c9c;
+  margin-bottom: 1.8rem;
+}
+
+/* el grid aquí será columna, tipo lista */
+.favorites-page #favGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+/* tarjeta especial de favoritos (usando la clase product-card que ya generas) */
+.favorites-page #favGrid .product-card {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 1.1rem 1.4rem 1.3rem;
+  border: 1px solid #f0e4ff;
+  box-shadow: 0 18px 40px rgba(123, 63, 228, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* la imagen va grandota, arriba, con bordes suaves */
+.favorites-page #favGrid .product-img {
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.favorites-page #favGrid .product-img img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  max-height: 260px;
+}
+
+/* badge de categoría */
+.favorites-page #favGrid .product-badge {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  padding: 0.15rem 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff9ae0, #ffb8ff);
+  color: #4a114f;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* corazón arriba a la derecha */
+.favorites-page #favGrid .favorite-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* texto dentro de la card */
+.favorites-page #favGrid h3 {
+  margin-top: 0.4rem;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.favorites-page #favGrid .product-description {
+  margin-bottom: 0.4rem;
+  color: #6a598e;
+}
+
+.favorites-page #favGrid .product-price {
+  font-weight: 600;
+  color: #4b2c90;
+}
+
+/* versión "wide" en pantallas grandes: imagen a la izquierda, texto a la derecha */
+@media (min-width: 900px) {
+  .favorites-page #favGrid .product-card {
+    flex-direction: row;
+    align-items: stretch;
+    padding: 1.1rem 1.6rem;
+  }
+
+  .favorites-page #favGrid .product-img {
+    flex: 0 0 40%;
+    max-width: 420px;
+    margin-bottom: 0;
+  }
+
+  .favorites-page #favGrid .product-card > h3,
+  .favorites-page #favGrid .product-card > .product-description,
+  .favorites-page #favGrid .product-card > .product-price {
+    margin-left: 1.2rem;
+  }
+}
+
+/* --- Dark mode para favoritos --- */
+body.dark-mode .favorites-page #favGrid .product-card {
+  background-color: #1a0f2b;
+  border-color: #34204b;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .favorites-page #favGrid .product-description {
+  color: #eee0ff;
+}
+
+body.dark-mode .favorites-page #favGrid .product-price {
+  color: #f8b5ff;
+}
+
+body.dark-mode .favorites-subtitle {
+  color: #cbb4ff;
+}
+
+/* === Buscador en el header === */
+
+.nav-icons {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.nav-search-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: inherit;
+}
+
+/* cajita flotante */
+.nav-search {
+  position: absolute;
+  top: 130%;
+  right: 0;
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.3rem 0.45rem 0.3rem 0.85rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  width: min(260px, 80vw);
+  z-index: 999;
+}
+
+.nav-search.show {
+  display: flex;
+}
+
+.nav-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: #3b2557;
+}
+
+.nav-search input::placeholder {
+  color: #b9a0e6;
+}
+
+.nav-search #search-btn {
+  border: none;
+  background: #7b3fe4;
+  color: #ffffff;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* dark mode */
+body.dark-mode .nav-search {
+  background: #1a0f2b;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .nav-search input {
+  color: #f7ecff;
+}
+
+body.dark-mode .nav-search input::placeholder {
+  color: #c9a6ff;
+}
+

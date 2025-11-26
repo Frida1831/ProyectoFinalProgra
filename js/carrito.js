@@ -6,116 +6,153 @@ const cartItems = document.getElementById("cart-items");
 const subtotalSpan = document.getElementById("subtotal");
 const totalSpan = document.getElementById("total");
 
-function renderCarrito() {
-    cartItems.innerHTML = "";
+const COSTO_ENVIO = 40; // fijo por ahora
 
-    if (carrito.length === 0) {
-        cartItems.innerHTML = `<p class="empty-cart">Tu carrito está vacío 🛒</p>`;
-        subtotalSpan.textContent = "$0.00";
-        totalSpan.textContent = "$40.00";
-        return;
-    }
-
-    let subtotal = 0;
-
-    carrito.forEach((item, index) => {
-        subtotal += item.precio;
-
-        const producto = document.createElement("div");
-        producto.classList.add("cart-item");
-
-        producto.innerHTML = `
-            <div class="cart-item-info">
-                <img src="${item.img}" class="cart-img">
-                <div>
-                    <h4>${item.nombre}</h4>
-                    <p>$${item.precio}.00 MXN</p>
-                </div>
-            </div>
-            <button class="remove-btn" data-index="${index}">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        `;
-
-        cartItems.appendChild(producto);
-    });
-// ====== 4. AGREGAR AL CARRITO (LocalStorage) ======
-function agregarAlCarrito(idProducto) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    const irALogin = confirm(
-      "Debes iniciar sesión para agregar productos al carrito. ¿Quieres ir a la página de login?"
-    );
-    if (irALogin) {
-      window.location.href = "login.html";
-    }
-    return;
-  }
-
-  const prod = productos.find((p) => p.id === idProducto);
-  if (!prod) return;
-
-  const piezas = obtenerPiezas(prod);
-  if (piezas <= 0) {
-    alert("Este producto está agotado 🥲");
-    return;
-  }
-
-  let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-  carrito.push({
-    nombre: prod.nombre,
-    precio: Number(prod.precio),
-    img: prod.imagen,
-  });
-
+function guardarCarrito() {
   localStorage.setItem("carrito", JSON.stringify(carrito));
-
-  alert("Producto agregado al carrito 🧺");
 }
 
-// ====== 5. FILTROS ======
-function aplicarFiltros() {
-  // Empezamos con todos los productos
-  let filtrados = [...productos];
+function renderCarrito() {
+  cartItems.innerHTML = "";
 
-  const cat = filtroCategoria.value;          // amigurumis / accesorios / decoracion / todos
-  const min = parseInt(precioMin.value) || 0; // si está vacío, 0
-  const max = parseInt(precioMax.value) || Infinity; // si está vacío, infinito
-  const of = filtroOferta.value;             // todos / oferta
+  if (!carrito || carrito.length === 0) {
+    cartItems.innerHTML = `<p class="empty-cart">Tu carrito está vacío 🛒</p>`;
+    subtotalSpan.textContent = "$0.00";
+    totalSpan.textContent = `$${COSTO_ENVIO.toFixed(2)}`;
+    return;
+  }
 
-  filtrados = filtrados.filter((p) => {
-    const okCat = cat === "todos" || p.categoria === cat;
-    const okPrecio = p.precio >= min && p.precio <= max;
-    const okOferta = of === "todos" || (of === "oferta" && p.oferta === true);
-    return okCat && okPrecio && okOferta;
+  let subtotal = 0;
+
+  carrito.forEach((item, index) => {
+    const cantidad = item.cantidad || 1;
+    const precioNum = Number(item.precio) || 0;
+    const subLinea = precioNum * cantidad;
+
+    subtotal += subLinea;
+
+    const producto = document.createElement("div");
+    producto.classList.add("cart-item");
+
+    producto.innerHTML = `
+      <div class="cart-item-info">
+        <img src="${item.img}" class="cart-img">
+        <div>
+          <h4>${item.nombre}</h4>
+          <p>$${precioNum.toFixed(2)} MXN c/u</p>
+          <p class="cart-qty">
+            Cantidad:
+            <button class="qty-btn" data-index="${index}" data-action="minus">-</button>
+            <span class="qty-value">${cantidad}</span>
+            <button class="qty-btn" data-index="${index}" data-action="plus">+</button>
+          </p>
+          <p class="cart-line-subtotal">
+            Subtotal: <strong>$${subLinea.toFixed(2)} MXN</strong>
+          </p>
+        </div>
+      </div>
+      <button class="remove-btn" data-index="${index}">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
+
+    cartItems.appendChild(producto);
   });
 
-  renderProductos(filtrados);
-}
+  subtotalSpan.textContent = `$${subtotal.toFixed(2)}`;
+  totalSpan.textContent = `$${(subtotal + COSTO_ENVIO).toFixed(2)}`;
 
-    subtotalSpan.textContent = `$${subtotal}.00`;
-    totalSpan.textContent = `$${subtotal + 40}.00`;
+  // Eventos para botones de cantidad
+  document.querySelectorAll(".qty-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index);
+      const action = e.currentTarget.dataset.action;
 
-    // Evento para eliminar producto
-    document.querySelectorAll(".remove-btn").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const index = e.currentTarget.dataset.index;
-            carrito.splice(index, 1);
-            localStorage.setItem("carrito", JSON.stringify(carrito));
-            renderCarrito();
-        });
+      if (action === "plus") {
+        carrito[idx].cantidad = (carrito[idx].cantidad || 1) + 1;
+      } else if (action === "minus") {
+        const nueva = (carrito[idx].cantidad || 1) - 1;
+        if (nueva <= 0) {
+          // si baja de 1, mejor preguntar si quiere eliminar
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: "warning",
+              title: "Eliminar producto",
+              text: "La cantidad quedaría en 0. ¿Quieres eliminar este producto del carrito?",
+              showCancelButton: true,
+              confirmButtonText: "Sí, eliminar",
+              cancelButtonText: "Cancelar",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                carrito.splice(idx, 1);
+                guardarCarrito();
+                renderCarrito();
+              }
+            });
+          } else {
+            if (confirm("¿Eliminar este producto del carrito?")) {
+              carrito.splice(idx, 1);
+              guardarCarrito();
+              renderCarrito();
+            }
+          }
+          return;
+        } else {
+          carrito[idx].cantidad = nueva;
+        }
+      }
+
+      guardarCarrito();
+      renderCarrito();
     });
+  });
+
+  // Evento para eliminar producto
+  document.querySelectorAll(".remove-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const index = e.currentTarget.dataset.index;
+
+      if (typeof Swal !== "undefined") {
+        Swal.fire({
+          icon: "warning",
+          title: "Eliminar producto",
+          text: "¿Seguro que quieres eliminar este producto del carrito?",
+          showCancelButton: true,
+          confirmButtonText: "Sí, eliminar",
+          cancelButtonText: "Cancelar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            carrito.splice(index, 1);
+            guardarCarrito();
+            renderCarrito();
+          }
+        });
+      } else {
+        if (confirm("¿Eliminar este producto?")) {
+          carrito.splice(index, 1);
+          guardarCarrito();
+          renderCarrito();
+        }
+      }
+    });
+  });
 }
 
 // Ir al checkout
 document.getElementById("checkout-btn").addEventListener("click", () => {
-    if (carrito.length === 0) {
-        alert("Tu carrito está vacío 🛒");
-        return;
+  if (!carrito || carrito.length === 0) {
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "info",
+        title: "Carrito vacío",
+        text: "Tu carrito está vacío 🛒",
+      });
+    } else {
+      alert("Tu carrito está vacío 🛒");
     }
-    location.href = "checkout.html";
+    return;
+  }
+  location.href = "checkout.html";
 });
 
 // Render inicial

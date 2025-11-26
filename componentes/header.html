@@ -1,45 +1,70 @@
 <header class="header">
-    <div class="top-bar">
-        <p>Bienvenidos a Chochetitos | Piezas tejidas a mano con amor</p>
-    </div>
+  <div class="top-bar">
+    <p>Bienvenidos a Chochetitos | Piezas tejidas a mano con amor</p>
+  </div>
 
-    <div class="nav-bar container">
-        <a href="index.html" class="logo">
-            <span class="logo-icon">🧶</span>
-            <span class="logo-text">Chochetitos</span>
-        </a>
+  <div class="nav-bar container">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">🧶</span>
+      <span class="logo-text">Chochetitos</span>
+    </a>
 
-        <nav class="nav-links">
-            <a href="index.html">Inicio</a>
+    <nav class="nav-links">
+      <a href="index.html">Inicio</a>
 
-<div class="nav-dropdown">
-    <button class="nav-btn">
-        Catálogo <i class="fa-solid fa-chevron-down"></i>
+      <div class="nav-dropdown">
+        <button class="nav-btn">
+          Catálogo <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu">
+          <a href="productos.html?categoria=amigurumis">Amigurumis</a>
+          <a href="productos.html?categoria=accesorios">Accesorios</a>
+          <a href="productos.html?categoria=decoracion">Decoración</a>
+        </div>
+      </div>
+
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="faq.html">Preguntas Frecuentes</a>
+      <!-- Link admin solo visible si es admin -->
+      <a href="admin.html" id="admin-link" style="display:none">Admin</a>
+    </nav>
+
+    <div class="nav-icons">
+  <!-- BUSCADOR -->
+  <button id="search-toggle" class="nav-search-btn" aria-label="Buscar productos">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+
+  <div class="nav-search" id="nav-search-box">
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Buscar productos..."
+      aria-label="Buscar productos"
+    />
+    <button id="search-btn" aria-label="Buscar">
+      <i class="fa-solid fa-arrow-right"></i>
     </button>
-    <div class="dropdown-menu">
-        <!-- OJO: mandamos un parámetro ?categoria=...  -->
-        <a href="productos.html?categoria=amigurumis">Amigurumis</a>
-        <a href="productos.html?categoria=accesorios">Accesorios</a>
-        <a href="productos.html?categoria=decoracion">Decoración</a>
-    </div>
+  </div>
+
+  <!-- FAVORITOS -->
+  <button id="btn-favoritos" class="nav-fav-btn">
+    <i class="fa-regular fa-heart"></i>
+    <span id="fav-count" class="fav-count-badge"></span>
+  </button>
+
+  <button onclick="location.href='carrito.html'">
+    <i class="fa-solid fa-cart-shopping"></i>
+  </button>
+
+  <!-- zona de usuario -->
+  <span id="user-name" class="user-name"></span>
+  <button id="login-btn">
+    <i class="fa-regular fa-user"></i>
+  </button>
+  <button id="logout-btn" style="display:none;">
+    Salir
+  </button>
 </div>
 
-
-            <a href="nosotros.html">Nosotros</a>
-            <a href="contacto.html">Contacto</a>
-            <a href="#">Preguntas Frecuentes</a>
-        </nav>
-
-        <div class="nav-icons">
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button><i class="fa-regular fa-heart"></i></button>
-            <button onclick="location.href='carrito.html'">
-    <i class="fa-solid fa-cart-shopping"></i>
-</button>
-        <button onclick="location.href='login.html'">
-    <i class="fa-regular fa-user"></i>
-</button>
-
-        </div>
-    </div>
-</header>

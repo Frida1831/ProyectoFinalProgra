@@ -57,11 +57,25 @@ async function cargarProductos() {
     productos = await respuesta.json();
     console.log("Productos desde la API:", productos);
 
-    // Leer categoría desde la URL (por ejemplo ?categoria=amigurumis)
     const params = new URLSearchParams(window.location.search);
-    const catURL = params.get("categoria"); // puede ser null
+    const catURL = params.get("categoria");
+    const busqueda = params.get("buscar"); // 👈 nuevo
 
-    if (catURL && catURL !== "todos") {
+    if (busqueda) {
+      const term = busqueda.toLowerCase();
+      const filtrados = productos.filter((p) => {
+        const nombre = (p.nombre || "").toLowerCase();
+        const desc = (p.descripcion || "").toLowerCase();
+        return nombre.includes(term) || desc.includes(term);
+      });
+
+      // Si quieres, limpia los filtros visuales
+      filtroCategoria.value = "todos";
+      precioMin.value = "";
+      precioMax.value = "";
+
+      renderProductos(filtrados);
+    } else if (catURL && catURL !== "todos") {
       filtroCategoria.value = catURL;
       aplicarFiltros();
     } else {
@@ -73,6 +87,7 @@ async function cargarProductos() {
       "<p>No se pudieron cargar los productos. Intenta más tarde.</p>";
   }
 }
+
 
 // ===========================
 // 4. MOSTRAR PRODUCTOS EN LA PÁGINA
@@ -98,17 +113,16 @@ function renderProductos(lista) {
     const dispo = obtenerDisponibilidad(p);
     const piezas = obtenerPiezas(p);
 
-    card.innerHTML = `
-      <div class="product-badge offer">${badgeTexto}</div>
+   card.innerHTML = `
+  <div class="product-badge offer">${badgeTexto}</div>
 
-      <button class="favorite-btn">
-        <i class="fa-regular fa-heart"></i>
-      </button>
+  <button class="favorite-btn" data-id="${p.id}">
+    <i class="fa-regular fa-heart"></i>
+  </button>
 
-      <div class="product-img">
-        <img src="${p.imagen}" alt="${p.nombre}">
-      </div>
-
+  <div class="product-img">
+    <img src="${p.imagen}" alt="${p.nombre}">
+  </div>
       <h3>${p.nombre}</h3>
 
       <p class="product-description">
@@ -193,14 +207,34 @@ window.addEventListener("keydown", (e) => {
 // 5. AGREGAR AL CARRITO (LocalStorage)
 // ===========================
 function agregarAlCarrito(idProducto) {
+  console.log("agregarAlCarrito llamado con id:", idProducto);
+
   const token = localStorage.getItem("token");
 
   if (!token) {
-    const irALogin = confirm(
-      "Debes iniciar sesión para agregar productos al carrito. ¿Quieres ir a la página de login?"
-    );
-    if (irALogin) {
-      window.location.href = "login.html";
+    // si hay SweetAlert
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "info",
+        title: "Inicia sesión",
+        text: "Debes iniciar sesión para agregar productos al carrito.",
+        showCancelButton: true,
+        confirmButtonText: "Ir a login",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "login.html";
+        }
+      });
+    } else {
+      // plan B
+      if (
+        confirm(
+          "Debes iniciar sesión para agregar productos al carrito. ¿Quieres ir a login?"
+        )
+      ) {
+        window.location.href = "login.html";
+      }
     }
     return;
   }
@@ -210,22 +244,52 @@ function agregarAlCarrito(idProducto) {
 
   const piezas = obtenerPiezas(prod);
   if (piezas <= 0) {
-    alert("Este producto está agotado 🥲");
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "warning",
+        title: "Producto agotado",
+        text: "Este producto está agotado 🥲",
+      });
+    } else {
+      alert("Este producto está agotado 🥲");
+    }
     return;
   }
 
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-  carrito.push({
-    nombre: prod.nombre,
-    precio: Number(prod.precio),
-    img: prod.imagen,
-  });
+  // ¿Ya existe este producto en el carrito?
+  const indiceExistente = carrito.findIndex((item) => item.id === prod.id);
+
+  if (indiceExistente >= 0) {
+    // ya existe → aumentar cantidad
+    carrito[indiceExistente].cantidad += 1;
+  } else {
+    // no existe → lo agregamos con cantidad 1
+    carrito.push({
+      id: prod.id,
+      nombre: prod.nombre,
+      precio: Number(prod.precio),
+      img: prod.imagen,
+      cantidad: 1,
+    });
+  }
 
   localStorage.setItem("carrito", JSON.stringify(carrito));
 
-  alert("Producto agregado al carrito 🧺");
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      icon: "success",
+      title: "Producto agregado",
+      text: "Producto agregado al carrito 🧺",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } else {
+    alert("Producto agregado al carrito 🧺");
+  }
 }
+
 
 // ===========================
 // 6. FILTROS

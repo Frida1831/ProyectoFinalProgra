@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar contraseña - Chochetitos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header></header>
+
+<main class="container page">
+  <section class="auth">
+    <h1>Recuperar contraseña</h1>
+    <p>Escribe el correo con el que te registraste. Si existe en nuestro sistema, te enviaremos un enlace para restablecer tu contraseña.</p>
+
+    <form class="auth-form" id="forgot-form">
+      <div class="form-group">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" required>
+      </div>
+
+      <button type="submit" class="btn-primary">Enviar instrucciones</button>
+
+      <p id="forgot-message" class="auth-message"></p>
+    </form>
+  </section>
+</main>
+
+<footer></footer>
+
+<script src="js/componentes.js"></script>
+<script src="js/recuperar.js"></script>
+<script src="js/accesibilidad.js"></script>
+
+</body>
+</html>
