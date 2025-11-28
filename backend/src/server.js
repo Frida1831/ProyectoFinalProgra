@@ -660,6 +660,94 @@ app.post("/api/auth/reset-password", async (req, res) => {
   }
 });
 
+// === MIDDLEWARE ADMIN ===
+function verificarAdmin(req, res, next) {
+  if (req.user && req.user.rol === 'admin') {
+    next();
+  } else {
+    return res.status(403).json({ msg: "Acceso denegado: Se requiere rol de administrador" });
+  }
+}
+
+// === RUTAS ADMIN (ESTADÍSTICAS Y STOCK) ===
+app.get("/api/admin/dashboard", autenticarJWT, verificarAdmin, async (req, res) => {
+  try {
+    const pool = getPool();
+    
+    // 1. Datos para la Gráfica: Ventas de los últimos 7 días
+    // Esta consulta agrupa las ventas por fecha y suma los totales
+    const [ventas] = await pool.query(`
+      SELECT DATE(creado_en) as fecha, SUM(total) as total_venta 
+      FROM ordenes 
+      GROUP BY DATE(creado_en) 
+      ORDER BY fecha DESC 
+      LIMIT 7
+    `);
+
+    // 2. Datos para el Reporte de Stock por Categoría
+    const [stock] = await pool.query(`
+      SELECT * FROM productos 
+      ORDER BY categoria, stock ASC
+    `);
+
+    res.json({
+      ventas: ventas.reverse(), // Invertir para que la gráfica vaya de izquierda a derecha
+      inventario: stock
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Error al obtener datos del dashboard" });
+  }
+});
+
+// === CRUD PRODUCTOS (ALTAS, BAJAS, MODIFICAR) ===
+
+// Crear Producto (Alta)
+app.post("/api/productos", autenticarJWT, verificarAdmin, async (req, res) => {
+    // Añadir 'descripcion' con valor por defecto, ya que no la pedimos en el frontend
+    const { nombre, precio, stock, categoria, imagen } = req.body; 
+    
+    try {
+        const pool = getPool();
+        // Asegúrate de que esta consulta incluya todas las columnas NOT NULL (usamos '' para descripcion y 'Disponible' para disponibilidad)
+        await pool.query(
+          "INSERT INTO productos (nombre, descripcion, precio, stock, categoria, imagen, disponibilidad, oferta) VALUES (?,?,?,?,?,?, 'Disponible', 0)", 
+          [nombre, "", precio, stock, categoria, imagen]
+        );
+        res.json({ msg: "Producto creado" });
+    } catch(err) { 
+        console.error("Error al crear producto:", err);
+        res.status(500).json({msg: "Error al crear producto en DB"}); 
+    }
+});
+
+// Editar Producto
+app.put("/api/productos/:id", autenticarJWT, verificarAdmin, async (req, res) => {
+    // Nota: El frontend actual no envía la imagen ni la descripción
+    const { nombre, precio, stock, categoria } = req.body;
+    try {
+        const pool = getPool();
+        // Solo actualizamos los campos que el frontend envía, dejando descripcion y imagen fuera por simplicidad.
+        await pool.query(
+          "UPDATE productos SET nombre=?, precio=?, stock=?, categoria=? WHERE id=?", 
+          [nombre, precio, stock, categoria, req.params.id]
+        );
+        res.json({ msg: "Producto actualizado" });
+    } catch(err) { 
+        console.error("Error al actualizar producto:", err);
+        res.status(500).json({msg: "Error al actualizar producto en DB"}); 
+    }
+});
+
+// Eliminar Producto
+app.delete("/api/productos/:id", autenticarJWT, verificarAdmin, async (req, res) => {
+    try {
+        const pool = getPool();
+        await pool.query("DELETE FROM productos WHERE id=?", [req.params.id]);
+        res.json({ msg: "Producto eliminado" });
+    } catch(err) { res.status(500).json(err); }
+});
 
 // === INICIAR SERVIDOR ===
 const PORT = process.env.PORT || 3000;

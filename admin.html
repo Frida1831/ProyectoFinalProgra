@@ -2,85 +2,296 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Chochetitos</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos específicos para el Admin */
+        .admin-dashboard { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; color: #333; }
+        
+        .low-stock { color: #e74c3c; font-weight: bold; }
+        
+        .btn-action { border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-delete { background: #e74c3c; color: white; }
+        .btn-add { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+
+        /* Modal simple */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 400px; max-width: 90%; }
+        .modal input, .modal select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
+    </style>
 </head>
 <body>
+    <header style="background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h1 style="font-size: 1.5rem; color: #7b3fe4;">Panel Admin 🧶</h1>
+        <div>
+            <span id="adminName">Admin</span>
+            <button onclick="cerrarSesion()" style="margin-left: 10px; padding: 5px 15px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Salir</button>
+        </div>
+    </header>
 
-<header></header>
-
-<main class="container page">
-    <section class="admin">
-
-        <h1>Panel de Administración</h1>
-        <p>Gestiona los productos de la tienda 🧶</p>
-
-        <!-- FORMULARIO PARA AGREGAR PRODUCTOS -->
-        <div class="admin-form">
-            <h3>Agregar producto</h3>
-
-            <form id="product-form">
-                <div class="form-group">
-                    <label>Nombre del producto</label>
-                    <input type="text" id="nombre" placeholder="Ej. Conejita Pastel" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Precio</label>
-                    <input type="number" id="precio" placeholder="320" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Categoría</label>
-                    <select id="categoria" required>
-                        <option value="">Selecciona...</option>
-                        <option value="amigurumis">Amigurumis</option>
-                        <option value="accesorios">Accesorios</option>
-                        <option value="decoracion">Decoración</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>URL de la imagen</label>
-                    <input type="text" id="img" placeholder="img/conejita.jpg" required>
-                </div>
-
-                <button type="submit" class="btn-primary">Agregar producto</button>
-            </form>
+    <main class="admin-dashboard">
+        
+        <div class="card full-width">
+            <h2>Ventas (Últimos 7 días)</h2>
+            <canvas id="ventasChart" style="max-height: 300px;"></canvas>
+            <button onclick="cargarDashboard()" style="margin-top:10px; cursor: pointer;">🔄 Actualizar Datos</button>
         </div>
 
-        <!-- TABLA DE PRODUCTOS -->
-        <div class="admin-table">
-            <h3>Listado de productos</h3>
+        <div class="card full-width">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Inventario de Productos</h2>
+                <button class="btn-add" onclick="abrirModalCrear()">+ Nuevo Producto</button>
+            </div>
 
-            <table>
+            <table id="tabla-stock">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Imagen</th>
                         <th>Nombre</th>
-                        <th>Precio</th>
                         <th>Categoría</th>
-                        <th>Acciones</th>
-                    </tr>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th> </tr>
                 </thead>
-                <tbody id="product-list"></tbody>
+                <tbody>
+                    </tbody>
             </table>
         </div>
+    </main>
 
-    </section>
-</main>
+    <div id="modalProducto" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Nuevo Producto</h2>
+            <form id="formProducto">
+                <input type="hidden" id="prodId">
+                
+                <label>Nombre del producto</label>
+                <input type="text" id="nombre" required placeholder="Ej. Conejito Amigurumi">
+                
+                <label>Categoría</label>
+                <select id="categoria" required>
+                    <option value="Amigurumis">Amigurumis</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Accesorios">Accesorios</option>
+                </select>
 
-<footer></footer>
+                <label>Precio ($)</label>
+                <input type="number" id="precio" required step="0.01" placeholder="0.00">
 
-<script src="js/componentes.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/accesibilidad.js"></script>
-<script src="js/favoritos.js"></script>
+                <label>Stock (Cantidad)</label>
+                <input type="number" id="stock" required placeholder="0">
 
+                <label>URL Imagen</label>
+                <input type="text" id="imagen" placeholder="img/producto.jpg">
 
+                <div class="modal-buttons">
+                    <button type="button" onclick="cerrarModal()" style="background: #ccc; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" style="background: #7b3fe4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/componentes.js"></script>
+    
+    <script>
+        // === PROTECCIÓN DE RUTA ===
+        (function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('usuario') || '{}');
+            if(!token || user.rol !== 'admin') {
+                window.location.href = 'index.html';
+            }
+            document.getElementById('adminName').innerText = user.nombre || 'Admin';
+        })();
+
+        let myChart;
+        const API_URL = 'http://localhost:3000/api';
+
+        // === CARGAR DATOS ===
+        async function cargarDashboard() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/admin/dashboard`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if(!res.ok) throw new Error("Error API");
+                const data = await res.json();
+
+                actualizarGrafica(data.ventas);
+                renderizarTabla(data.inventario); // La tabla incluye ID y Imagen ahora
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function renderizarTabla(productos) {
+            const tbody = document.querySelector('#tabla-stock tbody');
+            tbody.innerHTML = '';
+            
+            productos.forEach(prod => {
+                const row = document.createElement('tr');
+                const lowStock = prod.stock < 5 ? 'low-stock' : '';
+                
+                // Botones de acción con ID del producto
+                const acciones = `
+                    <button class="btn-action btn-edit" onclick='abrirModalEditar(${JSON.stringify(prod)})'>
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="eliminarProducto(${prod.id})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+
+                row.innerHTML = `
+                    <td>${prod.id}</td>
+                    <td><img src="${prod.imagen || 'img/placeholder.png'}" width="40"></td>
+                    <td>${prod.nombre}</td>
+                    <td>${prod.categoria}</td>
+                    <td>$${prod.precio}</td>
+                    <td class="${lowStock}">${prod.stock}</td>
+                    <td>${acciones}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function actualizarGrafica(ventas) {
+            const ctx = document.getElementById('ventasChart').getContext('2d');
+            const labels = ventas.map(v => new Date(v.fecha).toLocaleDateString());
+            const data = ventas.map(v => v.total_venta);
+
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ventas ($)',
+                        data: data,
+                        backgroundColor: '#7b3fe4',
+                        borderRadius: 5
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        // === FUNCIONES DEL MODAL (ALTAS Y MODIFICACIONES) ===
+        const modal = document.getElementById('modalProducto');
+        const form = document.getElementById('formProducto');
+
+        function abrirModalCrear() {
+            form.reset();
+            document.getElementById('prodId').value = ''; // ID vacío = Crear
+            document.getElementById('modalTitle').innerText = "Nuevo Producto";
+            modal.style.display = 'flex';
+        }
+
+        function abrirModalEditar(prod) {
+            document.getElementById('prodId').value = prod.id; // ID existente = Editar
+            document.getElementById('nombre').value = prod.nombre;
+            document.getElementById('categoria').value = prod.categoria || 'Amigurumis';
+            document.getElementById('precio').value = prod.precio;
+            document.getElementById('stock').value = prod.stock;
+            document.getElementById('imagen').value = prod.imagen || '';
+            
+            document.getElementById('modalTitle').innerText = "Editar Producto";
+            modal.style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            modal.style.display = 'none';
+        }
+
+        // === GUARDAR (POST o PUT) ===
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const id = document.getElementById('prodId').value;
+            
+            // Datos del formulario
+            const producto = {
+                nombre: document.getElementById('nombre').value,
+                categoria: document.getElementById('categoria').value,
+                precio: document.getElementById('precio').value,
+                stock: document.getElementById('stock').value,
+                imagen: document.getElementById('imagen').value
+            };
+
+            // Si hay ID es PUT (Editar), si no es POST (Crear)
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_URL}/productos/${id}` : `${API_URL}/productos`;
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(producto)
+                });
+
+                if(res.ok) {
+                    Swal.fire('Éxito', id ? 'Producto actualizado' : 'Producto creado', 'success');
+                    cerrarModal();
+                    cargarDashboard(); // Recargar tabla
+                } else {
+                    Swal.fire('Error', 'No se pudo guardar', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        // === ELIMINAR (DELETE) ===
+        async function eliminarProducto(id) {
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "No podrás revertir esto",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, borrar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token');
+                try {
+                    const res = await fetch(`${API_URL}/productos/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+
+                    if(res.ok) {
+                        Swal.fire('Borrado', 'El producto ha sido eliminado.', 'success');
+                        cargarDashboard(); // Recargar tabla
+                    } else {
+                        Swal.fire('Error', 'No se pudo eliminar', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+
+        // Iniciar
+        document.addEventListener("DOMContentLoaded", cargarDashboard);
+    </script>
 </body>
 </html>

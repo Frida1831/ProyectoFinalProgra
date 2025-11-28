@@ -69,14 +69,15 @@ async function cargarProductos() {
         return nombre.includes(term) || desc.includes(term);
       });
 
-      // Si quieres, limpia los filtros visuales
+      //limpia los filtros visuales
       filtroCategoria.value = "todos";
       precioMin.value = "";
       precioMax.value = "";
 
       renderProductos(filtrados);
     } else if (catURL && catURL !== "todos") {
-      filtroCategoria.value = catURL;
+      const categoriaNormalizada = catURL.toLowerCase(); 
+      filtroCategoria.value = categoriaNormalizada;
       aplicarFiltros();
     } else {
       renderProductos(productos);
@@ -292,30 +293,34 @@ function agregarAlCarrito(idProducto) {
 
 
 // ===========================
-// 6. FILTROS
+// 6. FILTROS (CÓDIGO CORREGIDO)
 // ===========================
 function aplicarFiltros() {
-  if (productos.length === 0) return;
+  if (productos.length === 0) return;
 
-  let filtrados = [...productos];
+  let filtrados = [...productos];
 
-  const cat = filtroCategoria.value;
-  const min = parseFloat(precioMin.value) || 0;
-  const max = parseFloat(precioMax.value) || Infinity;
-  const of = filtroOferta.value; // de momento no se usa
+  // 💡 CORRECCIÓN: Convertir el valor del filtro a minúsculas
+  const cat = filtroCategoria.value.toLowerCase(); 
+  const min = parseFloat(precioMin.value) || 0;
+  const max = parseFloat(precioMax.value) || Infinity;
+  const of = filtroOferta.value; // de momento no se usa
 
-  filtrados = filtrados.filter((p) => {
-    const precioNum = Number(p.precio) || 0;
+  filtrados = filtrados.filter((p) => {
+    const precioNum = Number(p.precio) || 0;
+    
+    // 💡 CORRECCIÓN: Convertir la categoría del producto a minúsculas para la comparación
+    const categoriaProducto = (p.categoria || '').toLowerCase();
 
-    const okCat = cat === "todos" || p.categoria === cat;
-    const okPrecio = precioNum >= min && precioNum <= max;
+    const okCat = cat === "todos" || categoriaProducto === cat;
+    const okPrecio = precioNum >= min && precioNum <= max;
 
-    const okOferta = true; // placeholder
+    const okOferta = true; // placeholder
 
-    return okCat && okPrecio && okOferta;
-  });
+    return okCat && okPrecio && okOferta;
+  });
 
-  renderProductos(filtrados);
+  renderProductos(filtrados);
 }
 
 // ===========================
