@@ -433,85 +433,91 @@ function obtenerDescuento(subtotal, cupon) {
 
 // === PDF ===
 function generarPDFNota(orden, detalles) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks = [];
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 50 });
+    const chunks = [];
 
-    doc.on("data", (chunk) => chunks.push(chunk));
-    doc.on("end", () => resolve(Buffer.concat(chunks)));
-    doc.on("error", reject);
+    doc.on("data", (chunk) => chunks.push(chunk));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
 
-    doc.fontSize(20).text("Chochetitos 🧶", { align: "center" }).moveDown(0.3);
+    doc.fontSize(20).text("Chochetitos 🧶", { align: "center" }).moveDown(0.3);
 
-    doc
-      .fontSize(12)
-      .text("Creaciones tejidas a mano con amor.", { align: "center" })
-      .moveDown(1);
+    doc
+      .fontSize(12)
+      .text("Creaciones tejidas a mano con amor.", { align: "center" })
+      .moveDown(1);
 
-    doc.fontSize(10);
-    doc.text(`Nota de compra #${orden.id}`);
-    doc.text(
-      `Fecha: ${new Date(orden.creado_en).toLocaleString("es-MX")}`
-    );
-    doc.text(`Cliente: ${orden.nombre_cliente}`);
-    doc.text(`Correo: ${orden.correo_cliente}`);
-    doc.text(
-      `Dirección: ${orden.direccion}, CP ${orden.cp}, País: ${orden.pais.toUpperCase()}`
-    );
-    doc.text(`Método de pago: ${orden.metodo_pago}`);
-    if (orden.cupon) doc.text(`Cupón utilizado: ${orden.cupon}`);
-    doc.moveDown(1);
+    doc.fontSize(10);
+    doc.text(`Nota de compra #${orden.id}`);
+    doc.text(
+      `Fecha: ${new Date(orden.creado_en).toLocaleString("es-MX")}`
+    );
+    doc.text(`Cliente: ${orden.nombre_cliente}`);
+    doc.text(`Correo: ${orden.correo_cliente}`);
+    doc.text(
+      `Dirección: ${orden.direccion}, CP ${orden.cp}, País: ${orden.pais.toUpperCase()}`
+    );
+    doc.text(`Método de pago: ${orden.metodo_pago}`);
+    if (orden.cupon) doc.text(`Cupón utilizado: ${orden.cupon}`);
+    doc.moveDown(1);
 
-    doc.fontSize(12).text("Detalle de la compra", { underline: true });
-    doc.moveDown(0.5);
+    doc.fontSize(12).text("Detalle de la compra", { underline: true });
+    doc.moveDown(0.5);
 
-    doc.font("Helvetica-Bold");
-    doc.text("Producto", 50, doc.y, { continued: true });
-    doc.text("Cant.", 260, doc.y, { continued: true });
-    doc.text("P. unit.", 310, doc.y, { continued: true });
-    doc.text("Subtotal", 400, doc.y);
-    doc.moveDown(0.5);
-    doc.font("Helvetica");
+    doc.font("Helvetica-Bold");
+    doc.text("Producto", 50, doc.y, { continued: true });
+    doc.text("Cant.", 260, doc.y, { continued: true });
+    doc.text("P. unit.", 310, doc.y, { continued: true });
+    doc.text("Subtotal", 400, doc.y);
+    doc.moveDown(0.5);
+    doc.font("Helvetica");
 
-    detalles.forEach((det) => {
-      doc.text(det.nombre_producto, 50, doc.y, { continued: true });
-      doc.text(String(det.cantidad), 260, doc.y, { continued: true });
-      doc.text(`$${det.precio_unitario.toFixed(2)}`, 310, doc.y, {
-        continued: true,
-      });
-      doc.text(`$${det.subtotal.toFixed(2)}`, 400, doc.y);
-    });
 
-    doc.moveDown(1);
+    detalles.forEach((det) => {
+      const precioUnitarioNum = Number(det.precio_unitario);
+      
+      doc.text(det.nombre_producto, 50, doc.y, { continued: true });
+      doc.text(String(det.cantidad), 260, doc.y, { continued: true });
+      
+      doc.text(`$${precioUnitarioNum.toFixed(2)}`, 310, doc.y, {
+        continued: true,
+      });
+      doc.text(`$${Number(det.subtotal).toFixed(2)}`, 400, doc.y); 
+    });
 
-    doc.text(`Subtotal: $${orden.subtotal.toFixed(2)}`, {
-      align: "right",
-    });
-    doc.text(`Impuestos: $${orden.impuestos.toFixed(2)}`, {
-      align: "right",
-    });
-    doc.text(`Envío: $${orden.envio.toFixed(2)}`, {
-      align: "right",
-    });
 
-    if (orden.descuento > 0)
-      doc.text(`Descuento: -$${orden.descuento.toFixed(2)}`, {
-        align: "right",
-      });
+    doc.moveDown(1);
 
-    doc.moveDown(0.2);
-    doc.font("Helvetica-Bold");
-    doc.text(`Total: $${orden.total.toFixed(2)}`, { align: "right" });
 
-    doc.moveDown(2);
-    doc.fontSize(10).text("Gracias por comprar en Chochetitos 💜", {
-      align: "center",
-    });
+    doc.text(`Subtotal: $${Number(orden.subtotal).toFixed(2)}`, {
+      align: "right",
+    });
+    doc.text(`Impuestos: $${Number(orden.impuestos).toFixed(2)}`, {
+      align: "right",
+    });
+    doc.text(`Envío: $${Number(orden.envio).toFixed(2)}`, {
+      align: "right",
+    });
 
-    doc.end();
-  });
+    if (orden.descuento > 0)
+      doc.text(`Descuento: -$${Number(orden.descuento).toFixed(2)}`, {
+        align: "right",
+      });
+
+    doc.moveDown(0.2);
+    doc.font("Helvetica-Bold");
+    doc.text(`Total: $${Number(orden.total).toFixed(2)}`, { align: "right" });
+    // === FIN DE CORRECCIÓN (TOTALES) ===
+
+    doc.moveDown(2);
+    doc.fontSize(10).text("Gracias por comprar en Chochetitos 💜", {
+      align: "center",
+    });
+
+    doc.end();
+  });
 }
-
 // === ENVIAR PDF POR CORREO ===
 async function enviarNotaPorCorreo(ordenId) {
   const pool = getPool();
@@ -522,6 +528,8 @@ async function enviarNotaPorCorreo(ordenId) {
   if (!ordenes.length) throw new Error("Orden no encontrada");
 
   const orden = ordenes[0];
+
+  console.log("📨 Intentando enviar correo a:", orden.correo_cliente);
 
   const [detalles] = await pool.query(
     "SELECT * FROM orden_detalle WHERE orden_id = ?",
@@ -690,9 +698,19 @@ app.get("/api/admin/dashboard", autenticarJWT, verificarAdmin, async (req, res) 
       ORDER BY categoria, stock ASC
     `);
 
+    const [totalVentasRows] = await pool.query(`
+        SELECT SUM(total) AS totalVentas
+        FROM ordenes
+        WHERE total IS NOT NULL 
+    `);
+    
+    // Extraemos el valor, asegurando que si la BD devuelve NULL (tabla vacía), sea 0.
+    const totalVentas = totalVentasRows[0].totalVentas || 0;
+
     res.json({
       ventas: ventas.reverse(), // Invertir para que la gráfica vaya de izquierda a derecha
-      inventario: stock
+      inventario: stock,
+      totalVentas: totalVentas
     });
 
   } catch (err) {

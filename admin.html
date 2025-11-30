@@ -42,7 +42,19 @@
     </header>
 
     <main class="admin-dashboard">
+
+        <div class="card full-width kpi-panel" style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <h3>Indicadores Globales</h3>
         
+        <div style="background: #f7f7f7; padding: 15px; border-radius: 8px; flex-grow: 1; min-width: 200px;">
+            <h4>Total de Ventas de la Compañía 💰</h4>
+            <p id="totalVentasGlobal" style="font-size: 1.8rem; font-weight: 600; color: #7b3fe4;">
+                $ 0.00 MXN
+            </p>
+        </div>
+        
+        </div>
+    <div class="card full-width">
         <div class="card full-width">
             <h2>Ventas (Últimos 7 días)</h2>
             <canvas id="ventasChart" style="max-height: 300px;"></canvas>
@@ -124,20 +136,29 @@
 
         // === CARGAR DATOS ===
         async function cargarDashboard() {
-            const token = localStorage.getItem('token');
-            try {
-                const res = await fetch(`${API_URL}/admin/dashboard`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if(!res.ok) throw new Error("Error API");
-                const data = await res.json();
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_URL}/admin/dashboard`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if(!res.ok) throw new Error("Error API");
+        const data = await res.json();
+        
+        // ======Total de Ventas
 
-                actualizarGrafica(data.ventas);
-                renderizarTabla(data.inventario); // La tabla incluye ID y Imagen ahora
-            } catch (error) {
-                console.error(error);
-            }
+        const totalVentasElement = document.getElementById("totalVentasGlobal");
+        if (totalVentasElement) {
+            // Formateamos el número para mostrar dos decimales (ej: 11140.00)
+            const ventasFormateadas = Number(data.totalVentas).toFixed(2);
+            totalVentasElement.textContent = `$ ${ventasFormateadas} MXN`;
         }
+
+        actualizarGrafica(data.ventas);
+        renderizarTabla(data.inventario); 
+    } catch (error) {
+        console.error(error);
+    }
+}
 
         function renderizarTabla(productos) {
             const tbody = document.querySelector('#tabla-stock tbody');

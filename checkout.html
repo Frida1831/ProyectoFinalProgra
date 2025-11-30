@@ -20,7 +20,6 @@
 
         <div class="checkout-grid">
 
-            <!-- FORMULARIO -->
             <form id="checkout-form" class="checkout-form">
 
                 <h3>Información del cliente</h3>
@@ -35,24 +34,13 @@
                     <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" required>
                 </div>
 
+                <div class="form-group">
+                    <label for="telefono">Teléfono móvil</label>
+                    <input type="tel" id="telefono" placeholder="10 dígitos" required maxlength="10">
+                    <small>Necesario para notificaciones de paquetería.</small>
+                </div>
+
                 <h3>Dirección de envío</h3>
-
-                <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <input type="text" id="direccion" placeholder="Calle #123" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="cp">Código postal</label>
-                    <input type="text" id="cp" placeholder="12345" required>
-                </div>
-
-                <h3>Envío</h3>
-
-                <div class="form-group">
-                    <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" placeholder="55 1234 5678" required>
-                </div>
 
                 <div class="form-group">
                     <label for="pais">País</label>
@@ -64,82 +52,104 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="direccion">Calle y número</label>
+                    <input type="text" id="direccion" placeholder="Ej. Av. Reforma #123, Depto 4" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cp">Código postal</label>
+                    <input type="text" id="cp" placeholder="00000" required maxlength="10">
+                </div>
+
                 <h3>Método de pago</h3>
 
                 <div class="form-group">
-                    <label for="metodo">Selecciona un método</label>
-
+                    <label for="metodo">Selecciona cómo quieres pagar</label>
                     <select id="metodo" required>
                         <option value="">Selecciona...</option>
-                        <option value="tarjeta">Tarjeta de crédito/débito</option>
-                        <option value="oxxo">Pago en OXXO</option>
-                        <option value="transferencia">Transferencia bancaria</option>
+                        <option value="tarjeta">Tarjeta de Crédito / Débito</option>
+                        <option value="transferencia">Transferencia Bancaria (SPEI)</option>
+                        <option value="oxxo">Efectivo en OXXO</option>
                     </select>
                 </div>
 
-                <!-- CAMPOS TARJETA -->
-                <div id="pago-tarjeta" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
+                <div id="pago-tarjeta" class="metodo-pago-extra" style="display:none; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
                     <div class="form-group">
-                        <label for="numTarjeta">Número de tarjeta</label>
-                        <input type="text" id="numTarjeta" placeholder="XXXX XXXX XXXX XXXX">
+                        <label>Número de tarjeta</label>
+                        <div class="input-icon">
+                            <i class="fa-regular fa-credit-card"></i>
+                            <input type="text" id="numTarjeta" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="nombreTarjeta">Nombre en la tarjeta</label>
-                        <input type="text" id="nombreTarjeta" placeholder="Como aparece en la tarjeta">
+                        <label>Nombre del titular</label>
+                        <input type="text" id="nombreTarjeta" placeholder="Como aparece en el plástico">
                     </div>
-                    <div class="form-group">
-                        <label for="expTarjeta">Fecha de expiración</label>
-                        <input type="text" id="expTarjeta" placeholder="MM/AA">
-                    </div>
-                    <div class="form-group">
-                        <label for="cvvTarjeta">CVV</label>
-                        <input type="password" id="cvvTarjeta" placeholder="3 dígitos">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Vencimiento</label>
+                            <input type="text" id="expTarjeta" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV / CVC</label>
+                            <input type="password" id="cvvTarjeta" placeholder="123" maxlength="4">
+                        </div>
                     </div>
                 </div>
 
-                <!-- PAGO TRANSFERENCIA -->
-                <div id="pago-transferencia" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
-                    <p>Realiza la transferencia a la siguiente cuenta:</p>
-                    <p><strong>Banco:</strong> Banco Ejemplo</p>
-                    <p><strong>CLABE:</strong> 123456789012345678</p>
+                <div id="pago-transferencia" class="metodo-pago-extra" style="display:none; background: #eef7ff; padding: 15px; border-radius: 8px;">
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-building-columns"></i> Realiza el pago a la siguiente cuenta y escribe tu referencia:
+                    </p>
+                    <ul style="list-style: none; padding: 0; font-size: 0.9rem; margin-bottom: 15px;">
+                        <li><strong>Banco:</strong> BBVA Bancomer</li>
+                        <li><strong>CLABE:</strong> 012 345 67890123456 7</li>
+                        <li><strong>Beneficiario:</strong> Chochetitos S.A. de C.V.</li>
+                    </ul>
                     <div class="form-group">
-                        <label for="referenciaTransf">Referencia de pago</label>
-                        <input type="text" id="referenciaTransf" placeholder="Escribe la referencia de tu comprobante">
+                        <label for="referenciaTransf">Referencia / Concepto usado</label>
+                        <input type="text" id="referenciaTransf" placeholder="Ej. PEDIDO-123">
+                        <small>Escribe el concepto que pusiste en tu app bancaria.</small>
                     </div>
                 </div>
 
-                <!-- PAGO OXXO -->
-                <div id="pago-oxxo" class="metodo-pago-extra" style="display:none; margin-top: 0.8rem;">
-                    <p>Se generará una referencia para pagar en OXXO:</p>
-                    <p><strong>Número de referencia:</strong> 1234 5678 9012 3456</p>
-                    <div class="form-group">
-                        <label for="nombreOxxo">Nombre de quien pagará</label>
-                        <input type="text" id="nombreOxxo" placeholder="Nombre completo">
+                <div id="pago-oxxo" class="metodo-pago-extra" style="display:none; background: #fffdf0; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
+                    <div style="text-align: center;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Oxxo_Logo.svg" alt="OXXO" style="height: 30px; margin-bottom: 10px;">
+                        <p style="font-size: 0.9rem;">
+                            Al confirmar tu compra, se generará un <strong>Código de Barras</strong>.
+                        </p>
+                        <p style="font-size: 0.85rem; color: #666;">
+                            Tienes 48 horas para ir a cualquier tienda OXXO y pagar en caja. Tu pedido se procesará una vez confirmado el pago.
+                        </p>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary">Confirmar compra</button>
+                <button type="submit" class="btn-primary" style="margin-top: 20px; width: 100%;">Confirmar y Pagar</button>
 
                 <p id="checkout-message" class="auth-message"></p>
             </form>
 
-            <!-- RESUMEN -->
             <div class="checkout-summary">
                 <h3>Resumen de compra</h3>
-
                 <div id="checkout-items"></div>
+                
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
 
                 <p class="summary-row">Subtotal: <span id="checkout-subtotal">$0.00</span></p>
+                <p class="summary-row">Envío: <span id="checkout-envio">$0.00</span></p>
                 <p class="summary-row">Impuestos: <span id="checkout-impuestos">$0.00</span></p>
-                <p class="summary-row">Envío: <span id="checkout-envio">$40.00</span></p>
-
-                <div class="form-group" style="margin-top: 0.8rem;">
-                    <label for="cupon">Cupón de descuento</label>
-                    <input type="text" id="cupon" placeholder="Ej. CROCHET10">
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <input type="text" id="cupon" placeholder="Código de cupón" style="width: 100%; padding: 8px;">
                 </div>
+                <p class="summary-row" style="color: green;">Descuento: <span id="checkout-descuento">$0.00</span></p>
 
-                <p class="summary-row">Descuento: <span id="checkout-descuento">$0.00</span></p>
-
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                
                 <p class="summary-total">Total: <span id="checkout-total">$0.00</span></p>
             </div>
 
@@ -149,31 +159,9 @@
 
 <footer></footer>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="js/componentes.js"></script>
 <script src="js/checkout.js"></script>
-
-<!-- TU SCRIPT PARA MÉTODOS DE PAGO -->
-<script>
-const metodoSelect = document.getElementById("metodo");
-const pagoTarjeta = document.getElementById("pago-tarjeta");
-const pagoTransferencia = document.getElementById("pago-transferencia");
-const pagoOxxo = document.getElementById("pago-oxxo");
-const mensaje = document.getElementById("checkout-message");
-
-function actualizarCamposPago() {
-    const metodo = metodoSelect.value;
-
-    pagoTarjeta.style.display = "none";
-    pagoTransferencia.style.display = "none";
-    pagoOxxo.style.display = "none";
-
-    if (metodo === "tarjeta") pagoTarjeta.style.display = "block";
-    if (metodo === "transferencia") pagoTransferencia.style.display = "block";
-    if (metodo === "oxxo") pagoOxxo.style.display = "block";
-}
-
-metodoSelect.addEventListener("change", actualizarCamposPago);
-</script>
 
 </body>
 </html>
