@@ -559,6 +559,8 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     if (!correo)
       return res.status(400).json({ msg: "Debes escribir tu correo" });
 
+    console.log(`[FORGOT] 1. Solicitud recibida para: ${correo}`);
+    
     const pool = getPool();
 
     const [rows] = await pool.query(
@@ -772,6 +774,13 @@ const PORT = process.env.PORT || 3000;
 
 async function iniciar() {
   await conectarBD();
+  try {
+        await transporter.verify();
+        console.log("✅ Servidor de correo listo y conectado (Nodemailer)");
+    } catch (error) {
+        console.error("❌ ERROR CRÍTICO DE CORREO:", error.message);
+        console.warn("ADVERTENCIA: La funcionalidad de enviar correos (Recuperar Contraseña/Ordenes) no funcionará.");
+    }
   app.listen(PORT, () => {
     console.log(`🚀 Servidor Chochetitos escuchando en puerto ${PORT}`);
   });

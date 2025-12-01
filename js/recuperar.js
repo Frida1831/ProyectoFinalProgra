@@ -3,6 +3,8 @@ document
   .addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    console.log("--- Formulario enviado. Iniciando proceso de Fetch ---");
+
     const correo = document.getElementById("correo").value.trim();
 
     if (!correo) {
