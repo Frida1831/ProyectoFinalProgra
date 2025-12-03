@@ -670,6 +670,78 @@ app.post("/api/auth/reset-password", async (req, res) => {
   }
 });
 
+// === RUTA DE CONTACTO ===
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { nombre, correo, asunto, mensaje } = req.body;
+
+    if (!nombre || !correo || !mensaje) {
+      return res.status(400).json({ msg: "Por favor llena todos los campos." });
+    }
+
+    // 1. Correo para TI (Admin) - Aviso de nuevo mensaje
+    const mailOptionsAdmin = {
+      from: `"Formulario Web" <${process.env.SMTP_USER}>`,
+      to: "chochetitos31@gmail.com", // Tu correo personal
+      subject: `Nuevo Mensaje Web: ${asunto}`,
+      html: `
+        <h3>Nuevo mensaje de contacto</h3>
+        <p><strong>De:</strong> ${nombre} (${correo})</p>
+        <p><strong>Asunto:</strong> ${asunto}</p>
+        <p><strong>Mensaje:</strong></p>
+        <blockquote style="background: #f9f9f9; padding: 10px; border-left: 5px solid #7b3fe4;">
+          ${mensaje}
+        </blockquote>
+      `
+    };
+
+    // 2. Correo para el USUARIO - Respuesta automática con Marca
+    const mailOptionsUser = {
+      from: `"Chochetitos 🧶" <${process.env.SMTP_USER}>`,
+      to: correo,
+      subject: "Hemos recibido tu mensaje - Chochetitos",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+            
+            <div style="background-color: #7b3fe4; padding: 20px; text-align: center; color: white;">
+                <h1 style="margin: 0; font-size: 28px;">Chochetitos 🧶</h1>
+            </div>
+
+            <div style="padding: 20px; text-align: center;">
+                <p style="font-style: italic; color: #666; font-size: 16px; margin-bottom: 20px;">
+                    "Creaciones tejidas a mano con amor."
+                </p>
+                
+                <h2 style="color: #333;">¡Hola, ${nombre}!</h2>
+                
+                <p style="font-size: 18px; color: #27ae60; font-weight: bold;">
+                    En breve será atendido.
+                </p>
+
+                <p style="color: #555;">
+                    Gracias por ponerte en contacto con nosotros. Hemos recibido tu mensaje sobre "<strong>${asunto}</strong>" y nuestro equipo te responderá lo antes posible.
+                </p>
+            </div>
+
+            <div style="background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #888;">
+                &copy; ${new Date().getFullYear()} Chochetitos. Todos los derechos reservados.
+            </div>
+        </div>
+      `
+    };
+
+    // Enviar ambos correos
+    await transporter.sendMail(mailOptionsAdmin);
+    await transporter.sendMail(mailOptionsUser);
+
+    res.json({ msg: "Mensaje enviado correctamente." });
+
+  } catch (err) {
+    console.error("Error en /api/contact:", err);
+    res.status(500).json({ msg: "Error al enviar el mensaje." });
+  }
+});
+
 // === MIDDLEWARE ADMIN ===
 function verificarAdmin(req, res, next) {
   if (req.user && req.user.rol === 'admin') {
