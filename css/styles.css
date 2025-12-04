@@ -2101,3 +2101,114 @@ body.dark-mode .nav-search input::placeholder {
   color: #c9a6ff;
 }
 
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 40px;
+}
+
+footer {
+    background: #5a3d78;
+    color: white;
+    padding-top: 40px;
+}
+
+/* CONTENEDOR DE LAS COLUMNAS */
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 40px 20px;
+    flex-wrap: wrap;
+}
+
+/* CADA COLUMNA */
+.footer-col {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Estilos de textos */
+.footer-col h4 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.footer-col p, 
+.footer-col a {
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: white;
+}
+
+/* Redes sociales */
+.footer-social a {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+/* Línea final */
+.footer-bottom {
+    text-align: center;
+    padding: 20px 10px;
+    background: #4b2e63;
+    margin-top: 20px;
+}
+footer {
+    background: #5a3d78;
+    color: white;
+    padding: 20px 0; /* 🔥 antes era 40px o más */
+}
+
+footer {
+    background: #5a3d78;
+    color: white;
+    padding: 10px 0; /* 🔥 mucho más pequeño */
+}
+
+/* Contenedor principal */
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px; /* 🔥 casi sin espacio entre columnas */
+    padding: 10px 20px; /* 🔥 muy compacto */
+    flex-wrap: wrap;
+}
+
+/* Columnas */
+.footer-col {
+    flex: 1;
+    min-width: 200px; /* 🔥 más chiquito */
+}
+
+/* Títulos de las columnas */
+.footer-col h4 {
+    margin-bottom: 5px; 
+    font-size: 16px;
+}
+
+/* Textos y enlaces */
+.footer-col p,
+.footer-col a {
+    margin-bottom: 4px; 
+    font-size: 14px;
+}
+
+/* Redes sociales */
+.footer-social a {
+    font-size: 18px; 
+}
+
+/* Parte de abajo */
+.footer-bottom {
+    text-align: center;
+    padding: 6px; 
+    background: #4b2e63;
+    font-size: 13px;
+}
+
