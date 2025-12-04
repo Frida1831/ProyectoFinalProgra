@@ -742,6 +742,72 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+// === SUSCRIPCIÓN NEWSLETTER ===
+app.post("/api/subscribe", async (req, res) => {
+  try {
+    const { correo } = req.body;
+
+    if (!correo) return res.status(400).json({ msg: "Falta el correo." });
+
+    const pool = getPool();
+
+    // 1. Verificar si ya está suscrito
+    const [existing] = await pool.query("SELECT id FROM newsletter WHERE correo = ?", [correo]);
+    if (existing.length > 0) {
+      return res.status(400).json({ msg: "Este correo ya está suscrito." });
+    }
+
+    // 2. Guardar en BD
+    await pool.query("INSERT INTO newsletter (correo) VALUES (?)", [correo]);
+
+    // 3. Diseñar el Correo (HTML)
+    const htmlCupón = `
+      <div style="font-family: 'Poppins', sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0;">
+        
+        <div style="background-color: #7b3fe4; padding: 30px; text-align: center; color: white;">
+            <h1 style="margin: 0; font-size: 32px; letter-spacing: 1px;">Chochetitos 🧶</h1> <p style="margin: 5px 0 0; font-style: italic; opacity: 0.9;">"Creaciones tejidas a mano con amor"</p> </div>
+
+        <div style="padding: 40px 30px; text-align: center; color: #333;">
+            <h2 style="color: #333; margin-top: 0;">¡Bienvenido a la familia! 💜</h2>
+            <p style="font-size: 16px; line-height: 1.5; color: #555;">
+                Gracias por suscribirte a nuestro boletín. Ahora serás la primera persona en enterarte de nuestros nuevos modelos, ofertas y tutoriales de tejido.
+            </p>
+            <p style="font-size: 16px; margin-bottom: 30px;">
+                Como agradecimiento, aquí tienes un regalo especial para tu primera compra:
+            </p>
+
+            <div style="background-color: #f3e5f5; border: 2px dashed #7b3fe4; border-radius: 8px; padding: 20px; display: inline-block; margin-bottom: 20px;">
+                <span style="display: block; font-size: 14px; color: #7b3fe4; font-weight: bold; margin-bottom: 5px;">TU CUPÓN DE DESCUENTO</span>
+                <span style="display: block; font-size: 28px; letter-spacing: 3px; font-weight: 800; color: #333;">BIENVENIDO15</span>
+                <span style="display: block; font-size: 12px; color: #666; margin-top: 5px;">Válido para un 15% de descuento en toda la tienda</span>
+            </div>
+
+            <br>
+            <a href="http://127.0.0.1:5500" style="display: inline-block; background-color: #7b3fe4; color: white; text-decoration: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; margin-top: 20px;">Ir a la tienda</a>
+        </div>
+
+        <div style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #999;">
+            &copy; ${new Date().getFullYear()} Chochetitos. Todos los derechos reservados.
+        </div>
+      </div>
+    `;
+
+    // 4. Enviar Correo
+    await transporter.sendMail({
+      from: `"Chochetitos 🧶" <${process.env.SMTP_USER}>`,
+      to: correo,
+      subject: "¡Aquí tienes tu regalo de bienvenida! 🎁",
+      html: htmlCupón,
+    });
+
+    res.status(201).json({ msg: "Suscripción exitosa. Revisa tu correo." });
+
+  } catch (err) {
+    console.error("Error en /api/subscribe:", err);
+    res.status(500).json({ msg: "Error al suscribirse." });
+  }
+});
+
 // === MIDDLEWARE ADMIN ===
 function verificarAdmin(req, res, next) {
   if (req.user && req.user.rol === 'admin') {

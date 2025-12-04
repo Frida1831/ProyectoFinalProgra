@@ -1,7 +1,9 @@
-// Obtener carrito desde LocalStorage
+// js/checkout.js
+
+// 1. Obtener carrito desde LocalStorage
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-// Elementos DOM
+// 2. Elementos DOM (Referencias)
 const itemsDiv = document.getElementById("checkout-items");
 const subtotalSpan = document.getElementById("checkout-subtotal");
 const impuestosSpan = document.getElementById("checkout-impuestos");
@@ -11,19 +13,19 @@ const totalSpan = document.getElementById("checkout-total");
 const mensaje = document.getElementById("checkout-message");
 
 const selectPais = document.getElementById("pais");
-const inputCupon = document.getElementById("cupon");
+const inputCupon = document.getElementById("cupon"); // El input del cupón en el resumen
 const metodoSelect = document.getElementById("metodo");
 
-// Elementos de pago
+// Elementos de métodos de pago
 const pagoTarjeta = document.getElementById("pago-tarjeta");
 const pagoTransferencia = document.getElementById("pago-transferencia");
 const pagoOxxo = document.getElementById("pago-oxxo");
 
-// === 1. LÓGICA VISUAL DE MÉTODOS DE PAGO ===
+// === 3. LÓGICA DE VISUALIZACIÓN DE MÉTODOS DE PAGO ===
 metodoSelect.addEventListener("change", () => {
     const metodo = metodoSelect.value;
     
-    // Ocultar todos primero
+    // Ocultar todos
     pagoTarjeta.style.display = "none";
     pagoTransferencia.style.display = "none";
     pagoOxxo.style.display = "none";
@@ -34,10 +36,11 @@ metodoSelect.addEventListener("change", () => {
     if (metodo === "oxxo") pagoOxxo.style.display = "block";
 });
 
-// === 2. CÁLCULOS (IMPUESTOS, ENVIO, DESC) ===
+// === 4. CÁLCULOS (LÓGICA DE NEGOCIO) ===
+
 function obtenerEnvioYImpuestos(subtotal, pais) {
-    let envio = 40;
-    let tasaImpuesto = 0.16; 
+    let envio = 40; // Default México
+    let tasaImpuesto = 0.16; // 16% IVA
 
     if (pais === "us") {
         envio = 120;
@@ -46,29 +49,45 @@ function obtenerEnvioYImpuestos(subtotal, pais) {
         envio = 90;
         tasaImpuesto = 0.0;
     }
-    // Si no selecciona país, defaults a MX
+    // Si pais es "" o "mx", se queda con los defaults
     
     return { envio, impuestos: subtotal * tasaImpuesto };
 }
 
 function obtenerDescuento(subtotal, cupon) {
     if (!cupon) return 0;
+    
     const code = cupon.trim().toUpperCase();
-    if (code === "CROCHET10") return subtotal * 0.1; 
-    return 0;
+
+    // CUPONES VÁLIDOS
+    if (code === "CROCHET10") {
+        return subtotal * 0.10; // 10% de descuento
+    }
+    if (code === "BIENVENIDO15") { // Ejemplo de otro cupón
+        return subtotal * 0.15;
+    }
+
+    return 0; // Cupón no válido
 }
 
-// === 3. RENDERIZAR RESUMEN ===
+// === 5. RENDERIZAR RESUMEN (ACTUALIZA TOTALES) ===
 function renderResumen() {
     itemsDiv.innerHTML = "";
+
+    // Si no hay carrito
     if (!carrito || carrito.length === 0) {
-        itemsDiv.innerHTML = "<p>Carrito vacío 🛒</p>";
-        // Resetear valores a 0...
+        itemsDiv.innerHTML = "<p>Tu carrito está vacío 🛒</p>";
+        subtotalSpan.textContent = "$0.00";
+        impuestosSpan.textContent = "$0.00";
+        envioSpan.textContent = "$0.00";
+        descuentoSpan.textContent = "$0.00";
+        totalSpan.textContent = "$0.00";
         return;
     }
 
     let subtotal = 0;
 
+    // Listar productos
     carrito.forEach((item) => {
         const cantidad = item.cantidad || 1;
         const precioNum = Number(item.precio) || 0;
@@ -77,47 +96,64 @@ function renderResumen() {
 
         const div = document.createElement("div");
         div.classList.add("checkout-item");
-        // Nota: Asegúrate de tener estilos CSS para .checkout-item
+        // Estilo inline para asegurar que se vea bien sin tocar CSS
         div.innerHTML = `
-            <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-                <img src="${item.img}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
-                <div>
-                    <h4 style="margin:0; font-size:0.9rem;">${item.nombre}</h4>
-                    <small>${cantidad} x $${precioNum.toFixed(2)}</small>
+            <div style="display:flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem;">
+                <div style="display:flex; gap:10px;">
+                    <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                    <div>
+                        <strong>${item.nombre}</strong><br>
+                        <span style="color:#666;">${cantidad} x $${precioNum.toFixed(2)}</span>
+                    </div>
                 </div>
-                <div style="margin-left:auto; font-weight:bold;">$${subLinea.toFixed(2)}</div>
+                <div style="font-weight:600;">$${subLinea.toFixed(2)}</div>
             </div>
         `;
         itemsDiv.appendChild(div);
     });
 
+    // Obtener valores actuales de los inputs
     const pais = selectPais.value || "mx";
-    const cupon = inputCupon.value;
+    const cuponTexto = inputCupon.value; // Lo que el usuario escribió
 
+    // Calcular montos
     const { envio, impuestos } = obtenerEnvioYImpuestos(subtotal, pais);
-    const descuento = obtenerDescuento(subtotal, cupon);
+    const descuento = obtenerDescuento(subtotal, cuponTexto);
+
     const total = subtotal + impuestos + envio - descuento;
 
+    // Actualizar HTML
     subtotalSpan.textContent = `$${subtotal.toFixed(2)}`;
     impuestosSpan.textContent = `$${impuestos.toFixed(2)}`;
     envioSpan.textContent = `$${envio.toFixed(2)}`;
+    
+    // Mostrar descuento (en verde si aplica)
     descuentoSpan.textContent = `-$${descuento.toFixed(2)}`;
+    if(descuento > 0) {
+        descuentoSpan.style.color = "#27ae60"; 
+        descuentoSpan.style.fontWeight = "bold";
+    } else {
+        descuentoSpan.style.color = "inherit";
+        descuentoSpan.style.fontWeight = "normal";
+    }
+
     totalSpan.textContent = `$${total.toFixed(2)}`;
 }
 
-// Listeners para recalcular
+// === 6. LISTENERS PARA RECALCULAR AL INSTANTE ===
+// Cada vez que cambie el país o se escriba en el cupón, actualizamos
 selectPais.addEventListener("change", renderResumen);
-inputCupon.addEventListener("input", renderResumen);
+inputCupon.addEventListener("input", renderResumen); 
 
-// Inicializar
+// Carga inicial
 renderResumen();
 
 
-// === 4. PROCESAR COMPRA Y VALIDACIONES ===
+// === 7. PROCESAR COMPRA (ENVÍO AL BACKEND) ===
 document.getElementById("checkout-form").addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Datos generales
+    // Recolectar datos
     const nombre = document.getElementById("nombre").value.trim();
     const correo = document.getElementById("correo").value.trim();
     const telefono = document.getElementById("telefono").value.trim();
@@ -125,31 +161,27 @@ document.getElementById("checkout-form").addEventListener("submit", async functi
     const cp = document.getElementById("cp").value.trim();
     const pais = selectPais.value;
     const metodo = metodoSelect.value;
-    const cupon = inputCupon.value.trim();
+    const cupon = inputCupon.value.trim(); // Cupón final
 
-    // Validar carrito
+    // Validar Carrito
     if (!carrito || carrito.length === 0) {
-        return Swal.fire("Carrito vacío", "No hay productos para comprar", "warning");
+        return Swal.fire("Carrito vacío", "No tienes productos para comprar.", "warning");
     }
 
-    // Validar sesión
+    // Validar Sesión
     const token = localStorage.getItem("token");
     if (!token) {
         return Swal.fire({
             title: "Inicia sesión",
-            text: "Necesitas una cuenta para comprar",
+            text: "Necesitas una cuenta para completar la compra.",
             icon: "info",
             showCancelButton: true,
             confirmButtonText: "Ir a Login"
         }).then(r => { if(r.isConfirmed) window.location.href = "login.html"; });
     }
 
-    // --- VALIDACIÓN ESPECÍFICA POR MÉTODO DE PAGO ---
-    let detallesPagoExtra = {}; // Para simular envío al backend
-
-    if (metodo === "") {
-        return Swal.fire("Error", "Selecciona un método de pago", "error");
-    }
+    // Validaciones de Pago Específicas
+    let detallesPagoExtra = {};
 
     if (metodo === "tarjeta") {
         const num = document.getElementById("numTarjeta").value.trim();
@@ -158,34 +190,31 @@ document.getElementById("checkout-form").addEventListener("submit", async functi
         const cvv = document.getElementById("cvvTarjeta").value.trim();
 
         if (num.length < 13 || !nom || exp.length < 4 || cvv.length < 3) {
-            return Swal.fire("Datos de tarjeta", "Por favor revisa los datos de tu tarjeta", "warning");
+            return Swal.fire("Error en Tarjeta", "Por favor revisa los datos de tu tarjeta.", "warning");
         }
-        detallesPagoExtra = { tipo: 'tarjeta', terminacion: num.slice(-4) }; 
+        detallesPagoExtra = { tipo: 'tarjeta', terminacion: num.slice(-4) };
     } 
-    
     else if (metodo === "transferencia") {
         const ref = document.getElementById("referenciaTransf").value.trim();
-        if (!ref) {
-            return Swal.fire("Referencia Faltante", "Escribe la referencia de tu transferencia bancaria", "warning");
-        }
+        if (!ref) return Swal.fire("Falta Referencia", "Escribe la referencia de tu pago.", "warning");
         detallesPagoExtra = { tipo: 'transferencia', referencia: ref };
     } 
-    
     else if (metodo === "oxxo") {
-        // Oxxo no requiere inputs extra del usuario en el form
-        detallesPagoExtra = { tipo: 'oxxo', estatus: 'pendiente_pago_tienda' };
+        detallesPagoExtra = { tipo: 'oxxo', estatus: 'pendiente' };
+    } else {
+        return Swal.fire("Método de pago", "Selecciona un método de pago válido.", "warning");
     }
 
-    // Construir items
-    const items = carrito.map((item) => ({
+    // Preparar Items para API
+    const items = carrito.map(item => ({
         productoId: item.id,
-        cantidad: item.cantidad || 1,
+        cantidad: item.cantidad || 1
     }));
 
-    // UI Loading
+    // Loading
     Swal.fire({
-        title: "Procesando pedido...",
-        text: "Estamos validando tu pago",
+        title: "Procesando compra...",
+        text: "Por favor espera un momento",
         didOpen: () => Swal.showLoading(),
         allowOutsideClick: false
     });
@@ -195,41 +224,38 @@ document.getElementById("checkout-form").addEventListener("submit", async functi
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
+                "Authorization": "Bearer " + token,
             },
             body: JSON.stringify({
                 nombre, correo, telefono, direccion, cp, pais,
                 metodo, cupon, items,
-                // Nota: Tu backend actual tal vez no guarde 'detallesPagoExtra', 
-                // pero así es como se enviaría en una app real.
-                detallesPago: detallesPagoExtra 
+                detallesPago: detallesPagoExtra
             }),
         });
 
         const data = await resp.json();
 
         if (!resp.ok) {
-            throw new Error(data.msg || "Error al procesar");
+            throw new Error(data.msg || "Error al procesar la orden");
         }
 
-        // Éxito
+        // Éxito Total
         localStorage.removeItem("carrito");
         
-        let mensajeExito = "Tu orden ha sido creada.";
-        if (metodo === "oxxo") mensajeExito += " Te enviamos el código de barras a tu correo.";
-        if (metodo === "transferencia") mensajeExito += " Validaremos tu transferencia en breve.";
+        let msgExito = "Tu compra ha sido confirmada.";
+        if(metodo === "oxxo") msgExito += " Te enviamos el código de OXXO por correo.";
 
         Swal.fire({
             icon: "success",
-            title: "¡Gracias por tu compra!",
-            text: mensajeExito,
-            confirmButtonText: "Regresar"
+            title: "¡Compra Exitosa! 🎉",
+            text: `La nota se envió a tu correo electrónico (${correo}).`,
+            confirmButtonText: "Volver a la tienda"
         }).then(() => {
-            window.location.href = "index.html"; // O perfil.html si lo tienes
+            window.location.href = "index.html";
         });
 
     } catch (err) {
-        console.error(err);
+        console.error("Error Checkout:", err);
         Swal.fire("Error", err.message, "error");
     }
 });

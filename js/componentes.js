@@ -11,6 +11,9 @@ fetch("componentes/footer.html")
   .then(res => res.text())
   .then(html => {
     document.querySelector("footer").innerHTML = html;
+    if (typeof inicializarSuscripcion === 'function') {
+        inicializarSuscripcion();
+    }
   });
 
 function inicializarHeader() {
@@ -47,7 +50,6 @@ function inicializarHeader() {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     localStorage.removeItem("carrito");
-    // después podrás usar SweetAlert; por ahora:
     alert("Sesión cerrada");
     window.location.href = "index.html";
   });
