@@ -1,4 +1,29 @@
 // js/accesibilidad.js
+
+// ===============================
+// FUNCIONES AUXILIARES POR USUARIO
+// ===============================
+
+// Devuelve una clave de localStorage personalizada por usuario.
+// Ejemplos:
+//  - getAccessKey("theme") → "theme_5" si el usuario.id = 5
+//  - getAccessKey("zoom")  → "zoom_5"
+function getAccessKey(base) {
+  const usuarioJSON = localStorage.getItem("usuario");
+  if (!usuarioJSON) return base + "_guest";
+
+  try {
+    const usuario = JSON.parse(usuarioJSON);
+    if (usuario && usuario.id) {
+      return base + "_" + usuario.id;
+    }
+    return base + "_guest";
+  } catch (err) {
+    console.error("Error leyendo usuario para accesibilidad:", err);
+    return base + "_guest";
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Evitar duplicar si por algo se carga más de una vez
   if (document.querySelector(".access-widget")) return;
@@ -50,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const zoomLabel = widget.querySelector("#zoomLabel");
   const zoomButtons = widget.querySelectorAll(".zoom-btn");
 
-  // 1. Cargar preferencias guardadas
-  const savedTheme = localStorage.getItem("theme") || "light";
+  // 1. Cargar preferencias guardadas (POR USUARIO)
+  const savedTheme = localStorage.getItem(getAccessKey("theme")) || "light";
   if (savedTheme === "dark") {
     document.body.classList.add("dark-mode");
     chkDarkMode.checked = true;
@@ -61,7 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const ZOOM_MAX = 140;
   const ZOOM_STEP = 10;
 
-  let currentZoom = parseInt(localStorage.getItem("zoom") || "100", 10);
+  let currentZoom = parseInt(
+    localStorage.getItem(getAccessKey("zoom")) || "100",
+    10
+  );
   if (isNaN(currentZoom)) currentZoom = 100;
 
   aplicarZoom(currentZoom);
@@ -78,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.fontSize = valor + "%";
 
     zoomLabel.textContent = valor + "%";
-    localStorage.setItem("zoom", String(valor));
+    localStorage.setItem(getAccessKey("zoom"), String(valor));
   }
 
   // 3. Eventos
@@ -99,10 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
   chkDarkMode.addEventListener("change", () => {
     if (chkDarkMode.checked) {
       document.body.classList.add("dark-mode");
-      localStorage.setItem("theme", "dark");
+      localStorage.setItem(getAccessKey("theme"), "dark");
     } else {
       document.body.classList.remove("dark-mode");
-      localStorage.setItem("theme", "light");
+      localStorage.setItem(getAccessKey("theme"), "light");
     }
   });
 
@@ -118,3 +146,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+

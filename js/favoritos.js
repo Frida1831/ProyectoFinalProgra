@@ -1,39 +1,61 @@
-// === FAVORITOS (localStorage) ===
-let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+// js/favoritos.js
 
-// Guardar en LS
+// ===============================
+// FAVORITOS (localStorage)
+// ===============================
+
+const FAVORITOS_KEY = "favoritos";
+let favoritos = [];
+
+// Cargar favoritos desde localStorage
+function cargarFavoritos() {
+  try {
+    const raw = localStorage.getItem(FAVORITOS_KEY);
+    if (!raw) {
+      favoritos = [];
+      return;
+    }
+    const arr = JSON.parse(raw);
+    favoritos = Array.isArray(arr) ? arr.map((id) => Number(id)) : [];
+  } catch (err) {
+    console.error("Error al leer favoritos:", err);
+    favoritos = [];
+  }
+}
+
+// Guardar favoritos en localStorage
 function guardarFavoritos() {
-  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  localStorage.setItem(FAVORITOS_KEY, JSON.stringify(favoritos));
 }
 
 // Saber si un id está en favoritos
 function esFavorito(id) {
-  id = Number(id);
-  return favoritos.includes(id);
+  const num = Number(id);
+  return favoritos.includes(num);
 }
 
-// Agregar / quitar
-function toggleFavorito(id) {
-  id = Number(id);
+// Actualizar contador del header
+function actualizarContadorFavoritos() {
+  const badge = document.getElementById("fav-count");
+  if (!badge) return;
 
-  if (esFavorito(id)) {
-    favoritos = favoritos.filter((f) => f !== id);
+  const total = favoritos.length;
+  if (total > 0) {
+    badge.textContent = total;
+    badge.style.display = "inline-block";
   } else {
-    favoritos.push(id);
+    badge.textContent = "";
+    badge.style.display = "none";
   }
-
-  guardarFavoritos();
-  actualizarIconosFavoritos();
-  actualizarContadorFavoritos();
 }
 
-// Pintar corazones de las tarjetas
+// Pintar corazones de las tarjetas (.favorite-btn)
 function actualizarIconosFavoritos() {
-  document.querySelectorAll(".favorite-btn").forEach((btn) => {
+  const botones = document.querySelectorAll(".favorite-btn");
+  botones.forEach((btn) => {
     const id = Number(btn.dataset.id);
     const icon = btn.querySelector("i");
-
-    if (!icon) return;
+    if (!icon || !id) return;
 
     if (esFavorito(id)) {
       btn.classList.add("active");
@@ -47,45 +69,60 @@ function actualizarIconosFavoritos() {
   });
 }
 
-// Contador en el header
-function actualizarContadorFavoritos() {
-  const badge = document.getElementById("fav-count");
-  if (!badge) return;
-
-  const total = favoritos.length;
-
-  if (total <= 0) {
-    badge.textContent = "";
-    badge.style.display = "none";
-  } else {
-    badge.textContent = total > 9 ? "9+" : String(total);
-    badge.style.display = "flex";
+// Agregar / quitar favorito (solo si está logueado)
+function toggleFavorito(id) {
+  const usuarioJSON = localStorage.getItem("usuario");
+  if (!usuarioJSON) {
+    alert("Debes iniciar sesión para guardar productos en favoritos 💜");
+    window.location.href = "login.html";
+    return;
   }
+
+  const numId = Number(id);
+  if (!numId) return;
+
+  if (esFavorito(numId)) {
+    favoritos = favoritos.filter((f) => f !== numId);
+  } else {
+    favoritos.push(numId);
+  }
+
+  guardarFavoritos();
+  actualizarContadorFavoritos();
+  actualizarIconosFavoritos();
 }
 
-// === DELEGACIÓN DE CLICS ===
-document.addEventListener("click", (e) => {
-  // 1) Corazón de las tarjetas (.favorite-btn)
-  const cardBtn = e.target.closest(".favorite-btn");
-  if (cardBtn) {
-    e.stopPropagation(); // para que no abra el modal de producto
-    const id = cardBtn.dataset.id;
-    if (id) {
-      toggleFavorito(id);
-    }
-    return; // ya manejamos este click
-  }
-
-  // 2) Botón del header (#btn-favoritos)
-  const headerBtn = e.target.closest("#btn-favoritos");
-  if (headerBtn) {
-    e.preventDefault();
-    window.location.href = "favoritos.html";
-  }
-});
-
-// Al cargar el DOM, pintamos iconos/contador con lo que haya en localStorage
+// ===============================
+// INICIALIZACIÓN GLOBAL
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
-  actualizarIconosFavoritos();
+  // 1. Cargar desde LS
+  cargarFavoritos();
   actualizarContadorFavoritos();
+  actualizarIconosFavoritos();
+
+  // 2. Delegación de eventos global
+  document.body.addEventListener("click", (e) => {
+    // a) Botón de corazón en tarjetas
+    const favBtn = e.target.closest(".favorite-btn");
+    if (favBtn) {
+      e.preventDefault();
+      const id = favBtn.dataset.id;
+      if (id) toggleFavorito(id);
+      return;
+    }
+
+    // b) Botón del header (#btn-favoritos)
+    const headerBtn = e.target.closest("#btn-favoritos");
+    if (headerBtn) {
+      e.preventDefault();
+      const usuarioJSON = localStorage.getItem("usuario");
+      if (!usuarioJSON) {
+        alert("Debes iniciar sesión para ver tus favoritos 💜");
+        window.location.href = "login.html";
+      } else {
+        window.location.href = "favoritos.html";
+      }
+    }
+  });
 });

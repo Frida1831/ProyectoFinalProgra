@@ -1,3 +1,6 @@
+// js/register.js
+// === REGISTRO DE USUARIO CON SWEETALERT ===
+
 document
   .getElementById("register-form")
   .addEventListener("submit", async function (e) {
@@ -8,7 +11,16 @@ document
     const pass = document.getElementById("password").value.trim();
     const pass2 = document.getElementById("password2").value.trim();
 
-    // Validaciones
+    // Validaciones básicas en frontend
+    if (!nombre || !correo || !pass || !pass2) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor llena todos los campos.",
+      });
+      return;
+    }
+
     if (pass !== pass2) {
       Swal.fire({
         icon: "warning",
@@ -27,56 +39,49 @@ document
       return;
     }
 
-    if (nombre.length < 3) {
-      Swal.fire({
-        icon: "warning",
-        title: "Nombre muy corto",
-        text: "El nombre debe tener al menos 3 caracteres.",
-      });
-      return;
-    }
-
+    // Mostrar loader mientras se envía al backend
     Swal.fire({
-      title: "Creando tu cuenta...",
+      title: "Creando cuenta...",
       didOpen: () => Swal.showLoading(),
       allowOutsideClick: false,
+      allowEscapeKey: false,
     });
 
     try {
-      const respuesta = await fetch(
-        "http://localhost:3000/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nombre: nombre,
-            correo: correo,
-            password: pass,
-          }),
-        }
-      );
+      const resp = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre,
+          correo,
+          password: pass,
+        }),
+      });
 
-      const data = await respuesta.json();
+      const data = await resp.json();
 
-      if (!respuesta.ok) {
+      if (!resp.ok) {
+        // Error del backend (correo ya registrado, faltan datos, etc.)
         Swal.fire({
           icon: "error",
-          title: "No se pudo registrar",
-          text: data.msg || "Error al registrar.",
+          title: "No se pudo crear la cuenta",
+          text: data.msg || "Intenta de nuevo más tarde.",
         });
         return;
       }
 
+      // Registro correcto
       Swal.fire({
         icon: "success",
         title: "Cuenta creada",
-        text: "Tu cuenta se creó con éxito. Te llevamos al login.",
+        text: data.msg || "Tu cuenta se creó correctamente.",
         timer: 2000,
         showConfirmButton: false,
       });
 
+      // Redirigir a login
       setTimeout(() => {
         window.location.href = "login.html";
       }, 2000);
